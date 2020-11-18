@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.goods.GoodsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.goods.Goods">
+        <id column="id" property="id"/>
+        <result column="shop_id" property="shopId"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="goods_detail" property="goodsDetail"/>
+        <result column="goods_type_id" property="goodsTypeId"/>
+        <result column="goods_type_name" property="goodsTypeName"/>
+        <result column="goods_subclass_id" property="goodsSubclassId"/>
+        <result column="goods_subclass_name" property="goodsSubclassName"/>
+        <result column="goods_price" property="goodsPrice"/>
+        <result column="goods_retail_price" property="goodsRetailPrice"/>
+        <result column="goods_cost_price" property="goodsCostPrice"/>
+        <!--<result column="goods_num" property="goodsNum"/>-->
+        <result column="goods_surplus_num" property="goodsSurplusNum"/>
+        <result column="goods_spec" property="goodsSpec"/>
+        <result column="approval_flag" property="approvalFlag"/>
+        <result column="reason" property="reason"/>
+        <result column="limit_buy_flag" property="limitBuyFlag"/>
+        <result column="limit_buy_num" property="limitBuyNum"/>
+        <result column="use_count_down" property="useCountDown"/>
+        <result column="use_count_down_time" property="useCountDownTime"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="delete_flag" property="deleteFlag"/>
+        <result column="create_id" property="createId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_id" property="updateId"/>
+        <result column="update_time" property="updateTime"/>
+        <result property="distance" column="distance"/>
+        <result column="version" property="version"/>
+        <result column="last_valid_time" property="lastValidTime"/>
+        <result column="stick_status" property="stickStatus"/>
+        <result column="stick_weight" property="stickWeight"/>
+        <result column="goods_view_url" property="goodsViewUrl"/>
+        <result column="first_show_img" property="firstShowImg"/>
+        <result column="collect_flag" property="collectFlag"/>
+        <result column="putaway_time" property="putawayTime"/>
+        <result column="putaway_status" property="putawayStatus"/>
+        <result column="goods_sales" property="goodsSales"/>
+        <result column="write_off_start_time" property="writeOffStartTime"/>
+        <result column="write_off_end_time" property="writeOffEndTime"/>
+        <result column="hot" property="hot"/>
+        <result column="promotion_costs" property="promotionCosts"/>
+        <result column="promotion" property="promotion"/>
+        <result column="supply_chain" property="supplyChain"/>
+        <result column="supply_chain_id" property="supplyChainId"/>
+    </resultMap>
+
+
+    <resultMap id="GoodsDetailMap" type="com.edaochina.shopping.domain.vo.goods.AppGoodDetailVO">
+        <id column="id" property="id"/>
+        <result column="shop_id" property="shopId"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="goods_detail" property="goodsDetail"/>
+        <result column="goods_price" property="goodsPrice"/>
+        <result column="goods_retail_price" property="goodsRetailPrice"/>
+        <result column="goods_surplus_num" property="goodsSurplusNum"/>
+        <result column="goods_spec" property="goodsSpec"/>
+        <result column="limit_buy_flag" property="limitBuyFlag"/>
+        <result column="limit_buy_num" property="limitBuyNum"/>
+        <result column="last_valid_time" property="lastValidTime"/>
+        <result column="buy_num" property="buyNum"/>
+        <result column="shop_name" property="shopName"/>
+        <result column="in_shop_cart_num" property="inShopCartNum"/>
+        <result column="latitude" property="latitude"/>
+        <result column="longitude" property="longitude"/>
+        <result column="shop_address" property="shopAddress"/>
+        <result column="shop_phone" property="shopPhone"/>
+        <!-- 3.1 添加内容 -->
+        <result column="collect_flag" property="collectFlag"/>
+        <result column="collect_num" property="collectNum"/>
+        <result column="collected_num" property="collectedNum"/>
+        <result column="collect_last_time" property="collectLastValidTime"/>
+        <result column="collect_info" property="collectInfo"/>
+        <result column="order_num" property="orderNum"/>
+
+        <result column="first_show_img" property="firstShowImg"/>
+
+        <result column="qr_code" property="qrCode"/>
+        <result column="league" property="league"/>
+
+        <result column="supply_chain_id" property="supplyChainId"/>
+        <result column="supply_chain" property="supplyChain"/>
+        <result column="putaway_status" property="putawayStatus"/>
+    </resultMap>
+
+
+    <resultMap id="collectGoodMap" type="com.edaochina.shopping.domain.vo.goods.AppCollectGoodVO">
+        <id column="id" property="id"/>
+        <id column="first_show_img" property="img"/>
+        <result column="goods_price" property="goodsPrice"/>
+        <result column="goods_retail_price" property="goodsRetailPrice"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="collect_num" property="collectNum"/>
+        <result column="buy_num" property="collectedNum"/>
+        <result column="chain_flag" property="chainFlag"/>
+    </resultMap>
+
+
+    <resultMap id="SysGoodVoMap" type="com.edaochina.shopping.domain.vo.goods.SysGoodsVO">
+        <id column="id" property="id"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="shop_name" property="shopName"/>
+        <result column="img_url" property="imgUrl"/>
+        <result column="goods_price" property="goodsPrice"/>
+        <result column="approval_flag" property="approvalFlag"/>
+        <result column="collect_flag" property="collectFlag"/>
+        <result column="goods_surplus_num" property="goodsSurplusNum"/>
+        <result column="create_time" property="createTime"/>
+        <result column="stick_status" property="stickStatus"/>
+        <result column="putaway_status" property="putawayStatus"/>
+        <result column="putaway_flag" property="putawayFlag"/>
+        <result column="not_putaway_flag" property="notPutawayFlag"/>
+        <result column="goods_sales" property="goodsSales"/>
+        <result column="hot" property="hot"/>
+        <result column="promotion_costs" property="promotionCosts"/>
+        <result column="promotion" property="promotion"/>
+    </resultMap>
+
+    <sql id="distance">
+		ROUND(6378.138*2*ASIN(SQRT(POW(SIN(
+		(#{latitude}*pi()/180-sm.latitude*pi()/180)/2),2)+cos(#{latitude}*pi()/180)*cos(sm.latitude*pi()/180)*
+		pow(sin(
+		(#{longitude}*pi()/180-sm.longitude*pi()/180)/2),2)))*1000)
+	</sql>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, shop_id, goods_name, goods_detail, goods_type_id, goods_type_name, goods_subclass_id, goods_subclass_name, goods_price, goods_retail_price, goods_cost_price, goods_surplus_num, goods_spec, approval_flag, reason, limit_buy_flag, limit_buy_num, activity_count_down, activity_count_down_time, use_count_down, use_count_down_time, order_num, delete_flag, create_id, create_time, update_id, update_time,
+         version, promotion, promotion_costs, supply_chain, supply_chain_id
+    </sql>
+
+    <select id="getGoodsList" parameterType="com.edaochina.shopping.domain.dto.goods.QueryAppGoodsDTO"
+            resultType="com.edaochina.shopping.domain.vo.goods.AppGoodsVO">
+        select g.goods_price as goodsPrice,g.goods_retail_price as goodsRetailPrice,
+        g.order_num as orderNum,g.first_show_img as img
+        ,g.goods_name as goodsName,g.shop_id as shopId,sm.title as title,g.id as goodsId, sm.league as league
+        ,g.last_valid_time as lastValidTime,g.goods_detail as goodsDetail,g.goods_spec as goodsSpec, g.hot
+        from cdshopping.goods g
+        left join cdshopping.sys_user_merchant sm on g.shop_id = sm.id
+        <where>
+            <choose>
+                <when test="community != null and community != ''">
+                    and EXISTS (
+                    select 1 from sys_merchant_community mc
+                    where sm.id = mc.merchant_id
+                    and mc.community = #{community}
+                    )
+                </when>
+                <when test="maxDistance > 0">
+                    and #{maxDistance} >
+                    <include refid="distance"/>
+                </when>
+            </choose>
+            <if test="title != null and title != ''">
+                and sm.title like "%"#{title}"%"
+            </if>
+            <if test="goodsName != null and goodsName != ''">
+                and (g.goods_name like "%"#{goodsName}"%" or sm.title like "%"#{goodsName}"%")
+            </if>
+            <if test="goodsTypeId != null and goodsTypeId != ''">
+                and g.goods_type_id = #{goodsTypeId}
+            </if>
+
+            <if test="goodsSubclassId != null and goodsSubclassId != ''">
+                and g.goods_subclass_id = #{goodsSubclassId}
+            </if>
+
+            <if test="hot != null">
+                and g.hot = #{hot}
+            </if>
+            and g.putaway_time <![CDATA[ < ]]> now()
+            and g.last_valid_time > now()
+            and g.collect_flag = 0
+            and g.delete_flag = 10
+            and g.approval_flag = 30
+            and g.putaway_status = 10
+        </where>
+        order by g.hot desc,stick_weight desc ,g.create_time desc
+        <if test="goodsSalesOrder != null">
+            , g.goods_sales desc
+        </if>
+    </select>
+
+    <select id="getMemberGoodsList" parameterType="com.edaochina.shopping.domain.dto.goods.QueryAppGoodsDTO"
+            resultType="com.edaochina.shopping.domain.vo.goods.AppGoodsVO">
+        select g.goods_price as goodsPrice,g.goods_retail_price as goodsRetailPrice,
+        g.order_num as orderNum,g.first_show_img as img
+        ,g.goods_name as goodsName,g.shop_id as shopId,sm.title as title,g.id as goodsId
+        ,g.last_valid_time as lastValidTime,g.goods_detail as goodsDetail,g.goods_spec as goodsSpec, g.hot
+        from cdshopping.goods g
+        left join cdshopping.sys_user_merchant sm on g.shop_id = sm.id
+        <if test="community != null and community != ''">
+            LEFT JOIN cdshopping.sys_merchant_community mc ON sm.id = mc.merchant_id
+        </if>
+        <where>
+            <choose>
+                <when test="community != null and community != ''">
+                    and mc.community = #{community}
+                </when>
+                <when test="maxDistance > 0">
+                    and #{maxDistance} >
+                    <include refid="distance"/>
+                </when>
+            </choose>
+            <if test="title != null and title != ''">
+                and sm.title like "%"#{title}"%"
+            </if>
+            <if test="goodsName != null and goodsName != ''">
+                and (g.goods_name like "%"#{goodsName}"%" or sm.title like "%"#{goodsName}"%")
+            </if>
+            <if test="goodsTypeId != null and goodsTypeId != ''">
+                and g.goods_type_id like "%"#{goodsTypeId}"%"
+            </if>
+            <if test="hot != null">
+                and g.hot = #{hot}
+            </if>
+            and g.putaway_time <![CDATA[ < ]]> now()
+            and g.last_valid_time > now()
+            and g.collect_flag = 0
+            and g.delete_flag = 10
+            and g.approval_flag = 30
+            and g.putaway_status = 10
+        </where>
+        order by g.goods_price
+    </select>
+
+    <select id="getShopGoodsList" resultType="com.edaochina.shopping.domain.vo.goods.AppGoodsVO">
+        select g.goods_price as goodsPrice,g.goods_retail_price as goodsRetailPrice,
+        g.order_num as orderNum,g.first_show_img as img
+        ,g.goods_name as goodsName,g.shop_id as shopId,sm.title as title,g.id as goodsId
+        ,g.last_valid_time as lastValidTime,g.goods_detail as goodsDetail,g.goods_spec as goodsSpec, g.hot,
+        g.collect_flag
+        from cdshopping.goods g
+        left join cdshopping.sys_user_merchant sm on g.shop_id = sm.id
+        <where>
+            and g.putaway_time <![CDATA[ < ]]> now()
+            and g.last_valid_time > now()
+            and g.delete_flag = 10
+            and g.approval_flag = 30
+            and sm.id = #{shopId}
+            and g.putaway_status = 10
+        </where>
+        order by stick_weight desc ,g.create_time desc
+    </select>
+
+    <select id="querySticNumByCommuntyId" resultType="java.lang.Integer" parameterType="java.lang.String">
+        SELECT COUNT(1)
+        FROM cdshopping.goods g
+                 left join cdshopping.sys_user_merchant su ON su.id = g.`shop_id`
+                 LEFT JOIN cdshopping.sys_merchant_community mc ON su.id = mc.merchant_id
+        WHERE (
+                (g.`last_valid_time` > NOW() AND g.`approval_flag` = 30)
+                OR g.`approval_flag` = 10
+            )
+          AND mc.community = #{communtyId}
+          AND g.stick_status = 1
+          AND g.`delete_flag` = 10
+    </select>
+
+    <select id="queryByGoodsIdAndUserId" resultMap="GoodsDetailMap">
+        select g.id,g.shop_id,g.goods_name,g.goods_detail,case when g.collect_flag = 0 then g.goods_price
+        else gci.collect_price end as goods_price,
+               g.goods_retail_price,g.goods_surplus_num,g.goods_spec,
+               CASE
+        WHEN g.`limit_buy_flag` = 10
+        THEN 0
+        ELSE 1
+        END limit_buy_flag,limit_buy_num,
+               g.last_valid_time,g.goods_view_url,
+               CASE
+        WHEN g.`limit_buy_flag` = 10
+        THEN 0
+        ELSE 1
+        END limit_flag,
+               CASE WHEN g.`limit_buy_flag` = 10
+        THEN 0
+        WHEN g.`limit_buy_flag` = 20
+        THEN o.dayNum
+        ELSE o.allNum END                                              buy_num,
+               CASE when sci.id is not null then sci.num ELSE 0 end as in_shop_cart_num,
+               g.collect_flag,
+               gci.collect_num,
+               gci.buy_num         as collected_num,
+               gci.collect_info,
+               gci.last_valid_time as collect_last_time,
+               g.order_num,
+               g.first_show_img,
+               sm.title            as shop_name,
+               sm.longitude,
+               sm.latitude,
+               sm.address          as shop_address,
+               sm.phone            as shop_phone,
+               sm.league           as league,
+               g.qr_code,
+               g.supply_chain_id,
+               g.supply_chain,
+               case when g.putaway_time <![CDATA[ < ]]> now()
+            and g.last_valid_time > now()
+            and g.delete_flag = 10
+            and g.approval_flag = 30
+            and g.putaway_status = 10 then 1 else 0 end as putaway_status
+        from goods g
+        left JOIN
+        (SELECT
+        SUM(
+        CASE
+        WHEN om.`create_time` > DATE_FORMAT(NOW(), '%Y%m%d')
+        THEN om.goods_num
+        ELSE 0
+        END
+        ) dayNum,
+        SUM(om.goods_num) allNum,om.goods_id
+        FROM
+        order_main om
+        WHERE om.`user_id` = #{userId}
+        AND om.`status` IN (10, 20, 30, 50, 70 ,90)
+        and om.goods_id = #{goodsId}
+        ) o ON o.goods_id = g.id
+        left join sys_user_merchant sm on sm.id = g.shop_id
+        left join shopping_cart_info sci on sci.good_id = g.id and sci.user_id = #{userId} and sci.last_valid_time >
+        now()
+        left join goods_collect_info gci on gci.goods_id = g.id and gci.delete_flag = 0
+        where g.id = #{goodsId}
+    </select>
+
+
+    <update id="updateGoodsSurplusNumAndOrderNum">
+        update goods
+        set goods_surplus_num = goods_surplus_num - #{num},
+            order_num         = order_num + #{orderNum},
+            goods_sales = goods_sales + #{num}
+        where id = #{goodsId}
+          and goods_surplus_num >= #{num}
+    </update>
+
+    <select id="getCollectGoodsList" resultMap="collectGoodMap">
+        select g.id,g.first_show_img,gci.collect_price as
+        goods_price,g.goods_retail_price,g.goods_name,gci.collect_num,gci.buy_num,
+        g.supply_chain as chain_flag
+        from cdshopping.goods g
+        inner join cdshopping.sys_user_merchant s on g.shop_id = s.id
+        inner join cdshopping.goods_collect_info gci on gci.goods_id = g.id and gci.delete_flag = 0
+        LEFT JOIN cdshopping.sys_merchant_community mc ON s.id = mc.merchant_id
+        where g.collect_flag = 1
+        and g.approval_flag = 30
+        and g.last_valid_time > now()
+        and g.putaway_time <![CDATA[ < ]]> now()
+        and g.putaway_status = 10
+        and gci.last_valid_time > now()
+        and g.delete_flag = 10
+        <if test="community != null and community != ''">
+            and mc.community = #{community}
+        </if>
+    </select>
+
+    <select id="getUserCollectUserImg" resultType="java.lang.String">
+        select s.avatar
+        from order_main o
+        left join sys_user s on s.id = o.user_id
+        where o.goods_id = #{goodsId}
+        and o.status in (20,90,30)
+        order by o.create_time desc
+        limit 10
+    </select>
+
+    <update id="updateCollectFlag">
+        update goods
+        set collect_flag = #{collectFlag}
+        where id = #{goodsId}
+    </update>
+
+    <select id="queryMerchantPutawayNum" resultType="java.lang.Integer">
+        select count(1)
+        from goods
+        where shop_id = #{merchantId}
+        and putaway_status = 10
+        and approval_flag = 30
+        and delete_flag = 10
+        and last_valid_time > now()
+        and now() > putaway_time
+    </select>
+
+    <select id="getSysGoodsList" resultMap="SysGoodVoMap">
+        SELECT
+        g.id,
+        g.`goods_name`,
+        su.`title` AS shop_name,
+        g.`first_show_img` AS img_url,
+        g.`goods_price`,
+        g.approval_flag,
+        g.collect_flag,
+        g.goods_surplus_num,
+        g.create_time,
+        g.stick_status,
+        g.putaway_status,
+        g.hot,
+        g.promotion,
+        g.promotion_costs,
+        g.goods_sales,
+        CASE
+        WHEN g.approval_flag = 30
+        AND g.putaway_status = 10
+        AND g.last_valid_time > NOW()
+        AND NOW() > g.putaway_time
+        THEN 10
+        ELSE 20
+        END AS putaway_flag ,
+        CASE
+        WHEN g.approval_flag = 30
+        AND g.last_valid_time > NOW()
+        AND NOW() > g.putaway_time
+        THEN 10
+        ELSE 20
+        END AS not_putaway_flag
+        FROM
+        goods g,
+        sys_user_merchant su
+        WHERE g.`shop_id` = su.id
+        and g.delete_flag = 10
+        <if test="goodsSubclassId != null and goodsSubclassId != ''">
+            and g.goods_subclass_id = #{goodsSubclassId}
+        </if>
+        <if test="shopId != null and shopId != ''">
+            and su.id = #{shopId}
+        </if>
+        <if test="agentId != null and agentId != ''">
+            and exists (
+            SELECT * FROM agent_county_info aci
+            WHERE aci.agent_id = #{agentId}
+            and aci.county_code = su.county_id
+            )
+        </if>
+        <if test="goodsName != null and goodsName != ''">
+            and g.goods_name like "%"#{goodsName}"%"
+        </if>
+        <if test="supplyChain != null">
+            and g.supply_chain = #{supplyChain}
+        </if>
+        <if test="goodsId != null and goodsId != ''">
+            and g.id = #{goodsId}
+        </if>
+        <if test="goodsTypeId != null and goodsTypeId != ''">
+            and g.goods_type_id = #{goodsTypeId}
+        </if>
+        <if test="approvalFlag != null">
+            and g.approval_flag = #{approvalFlag}
+        </if>
+        <if test="communty != null and communty != ''">
+            and exists (
+            select 1
+            from sys_merchant_community sm
+            where sm.community = #{communty}
+            and sm.merchant_id = su.id
+            )
+        </if>
+        <if test="hot != null">
+            and g.hot = #{hot}
+        </if>
+        <if test="stickStatus != null">
+            and g.stick_status = #{stickStatus}
+        </if>
+        <if test="countyId != null ">
+            and su.county_id = #{countyId}
+        </if>
+        <if test="collectFlag != null">
+            and g.collect_flag = #{collectFlag}
+        </if>
+        <if test="putawayFlag != null">
+            <choose>
+                <when test="putawayFlag == 1">
+                    and g.approval_flag = 30
+                    AND g.putaway_status = 10
+                    AND g.last_valid_time > NOW()
+                    AND NOW() > g.putaway_time
+                </when>
+                <when test="putawayFlag == 0">
+                    and (
+                    g.approval_flag != 30
+                    or g.putaway_status != 10
+                    or NOW() > g.last_valid_time
+                    or g.putaway_time > now()
+                    )
+                </when>
+            </choose>
+        </if>
+        <if test="putawayStatus != null">
+            and g.putaway_status = #{putawayFlag}
+        </if>
+        <choose>
+            <when test="startTime != null and timeField != null and timeField != ''">
+                and g.${timeField} > #{startTime}
+            </when>
+            <when test="startTime != null">
+                and g.create_time > #{startTime}
+            </when>
+        </choose>
+        <choose>
+            <when test="endTime != null and timeField != null and timeField != ''">
+                and #{endTime} > g.${timeField}
+            </when>
+            <when test="endTime != null">
+                and #{endTime} > g.create_time
+            </when>
+        </choose>
+
+        <if test="shopName != null and shopName != ''">
+            and su.title like "%"#{shopName}"%"
+        </if>
+        ORDER BY g.create_time DESC
+    </select>
+</mapper>

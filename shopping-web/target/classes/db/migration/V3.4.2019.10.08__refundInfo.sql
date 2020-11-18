@@ -1,0 +1,4 @@
+ALTER TABLE `pay_refund_apply` MODIFY COLUMN `remit_status`  tinyint(2) NULL DEFAULT 10 COMMENT '退款打款状态(10:等待打款，20:打款成功，30：打款失败，40：已提交等待打款成功)' AFTER `shoper_refuse_reason`;
+ALTER TABLE `pay_refund_info` MODIFY COLUMN `refund_result`  tinyint(1) NOT NULL DEFAULT 0 COMMENT '退款结果(0退款失败，1退款成功，2:已成功提交)' AFTER `refund_fee`;
+ALTER TABLE `pay_refund_info` ADD COLUMN `refund_apply_id`  int(15) NULL DEFAULT 0 COMMENT '对应退款申请编号' AFTER `return_result`;
+ALTER TABLE `pay_refund_info` ADD COLUMN `call_back_result`  varchar(2048) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '回调结果' AFTER `refund_apply_id`;

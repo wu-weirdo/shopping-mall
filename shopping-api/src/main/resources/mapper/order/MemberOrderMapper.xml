@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.order.MemberOrderMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.order.MemberOrder">
+        <id column="id" property="id"/>
+        <result column="order_type" property="orderType"/>
+        <result column="user_id" property="userId"/>
+        <result column="out_order_no" property="outOrderNo"/>
+        <result column="calc_status" property="calcStatus"/>
+        <result column="pay_status" property="payStatus"/>
+        <result column="member_price" property="memberPrice"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="calc_time" property="calcTime"/>
+        <result column="county_id" property="countyId"/>
+        <result column="partener_id" property="partenerId"/>
+        <result column="agent_id" property="agentId"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+      id,order_type,user_id,out_order_no,calc_status,pay_status,member_price,create_time,update_time,calc_time,county_id,agent_id,partener_id
+    </sql>
+
+    <update id="updatePayStatusByOrderId">
+      update member_order
+      set pay_status = #{payStatus}
+      where out_order_no = #{orderId}
+    </update>
+
+    <select id="selectMemberOrderByOrderType" resultMap="BaseResultMap">
+        select *
+        from member_order
+        where pay_status = 1
+        and calc_status = 0
+        <if test="orderType != null ">
+            and order_type = #{orderType}
+        </if>
+        limit 100
+    </select>
+
+    <insert id="insertMemberOrder" parameterType="com.edaochina.shopping.domain.entity.order.MemberOrder">
+        insert into member_order(order_type,user_id,out_order_no,member_price,county_id,partener_id,agent_id)
+        values (#{orderType},#{userId},#{outOrderNo},#{memberPrice},#{countyId},#{partenerId},#{agentId})
+        <selectKey keyProperty="id" order="AFTER" resultType="int">
+            select last_insert_id()
+        </selectKey>
+    </insert>
+
+    <update id="updateCalcStatus">
+        update member_order set calc_status = #{calcStatus}
+        where id = #{id}
+    </update>
+
+    <select id="anticipatedAgentTodayInCome" resultType="java.math.BigDecimal">
+      SELECT SUM(CASE WHEN mo.`order_type` = 1 AND aap.`profit_ratio` IS NULL THEN mo.`member_price` * #{userProfitRatio} /10000
+WHEN  mo.`order_type` = 2 AND aap.`profit_ratio` IS NULL THEN mo.`member_price` * #{merchantProfitRatio} /10000
+ELSE mo.`member_price` * aap.`profit_ratio` /10000 END)
+FROM member_order mo
+LEFT JOIN area_agent_profit aap ON aap.`county_id` = mo.`county_id` AND aap.profit_type = mo.`order_type`
+LEFT JOIN agent_county_info aci ON aci.`city_code` = aap.`county_id`
+WHERE aci.`agent_id` = #{id}
+AND mo.`create_time` > #{startTime}
+AND mo.pay_status = 1
+and aci.del_flg = 0
+    </select>
+    <select id="selectMemberOrderByOutOrderNo" resultMap="BaseResultMap">
+        select *
+        from member_order
+        where out_order_no = #{outOrderNo}
+    </select>
+
+    <select id="queryMermberNum" resultType="java.lang.Integer">
+        select count(1)
+        from member_order mo
+        <!-- inner join agent_county_info aci on aci.county_code = mo.county_id -->
+        where mo.pay_status = 1 and mo.create_time > #{startTime}
+        <!--  and aci.agent_id = #{agentId} -->
+        and mo.agent_id = #{agentId}
+        <!-- and mo.create_time > aci.create_time -->
+    </select>
+
+    <select id="anticipatedPartenerTodayInCome" resultType="java.math.BigDecimal">
+          SELECT SUM(CASE WHEN mo.`order_type` = 1  THEN mo.`member_price` * #{userProfitRatio} /10000
+ WHEN  mo.`order_type` = 2 THEN mo.`member_price` * #{merchantProfitRatio} /10000 END)
+ FROM member_order mo
+ WHERE mo.`partener_id` = #{partenerId}
+ AND mo.`create_time` > #{startTime}
+ AND pay_status = 1
+    </select>
+
+    <select id="queryPartenerMermberNum" resultType="java.lang.Integer">
+       select count(1)
+        from member_order mo
+        where mo.pay_status = 1 and mo.create_time > #{beginTime}
+        and mo.partener_id = #{partenerId}
+    </select>
+</mapper>

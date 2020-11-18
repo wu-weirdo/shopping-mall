@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.sys.ContractInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.sys.ContractInfo">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_type" property="userType"/>
+        <result column="contract_template_id" property="contractTemplateId"/>
+        <result column="contract_name" property="contractName"/>
+        <result column="user_phone" property="userPhone"/>
+        <result column="user_sign_transaction_id" property="userSignTransactionId"/>
+        <result column="user_sign_result" property="userSignResult"/>
+        <result column="auto_sign_transaction_id" property="autoSignTransactionId"/>
+        <result column="auto_sign_result" property="autoSignResult"/>
+        <result column="download_contract_url" property="downloadContractUrl"/>
+        <result column="show_contract_url" property="showContractUrl"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_id, user_type, contract_template_id, contract_name, user_phone, user_sign_transaction_id, user_sign_result, auto_sign_transaction_id, auto_sign_result, download_contract_url, show_contract_url, create_time, update_time, remark
+    </sql>
+    <insert id="insertContractInfo">
+        insert into contract_info(id,user_id,user_type,contract_template_id,contract_name)
+        values(#{id},#{userId},#{userType},#{contractTemplateId},#{contractName})
+    </insert>
+    <update id="updateContractInfo">
+        update contract_info
+        set user_phone = #{userPhone},user_sign_transaction_id = #{userSignTransactionId},user_sign_result = #{userSignResult}
+        where id = #{id}
+    </update>
+    <update id="updateAutoContract">
+        update contract_info
+        set auto_sign_transaction_id = #{autoSignTransactionId},auto_sign_result = #{autoSignResult}
+        where id = #{id}
+    </update>
+    <update id="updateContractUrl">
+        update contract_info
+        set download_contract_url = #{downloadContractUrl},show_contract_url = #{showContractUrl}
+        where id = #{id}
+    </update>
+
+    <select id="queryById" resultMap="BaseResultMap">
+        select * from contract_info
+        where id = #{contractId}
+    </select>
+
+    <select id="queryByUserSignTId" resultMap="BaseResultMap">
+        select * from contract_info
+        where user_sign_transaction_id = #{transactionId}
+    </select>
+
+</mapper>

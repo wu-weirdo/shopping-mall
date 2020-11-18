@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.user.SysAddressMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.sys.SysAddress">
+        <id column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="parent_code" property="parentCode"/>
+        <result column="level" property="level"/>
+        <result column="adcode" property="adcode"/>
+    </resultMap>
+
+    <resultMap id="AreaMap" type="com.edaochina.shopping.domain.vo.sys.SysHasAgenAreaVo">
+        <result column="province_id" property="provinceCode"/>
+        <result column="province_name" property="provinceName"/>
+        <result column="city_id" property="cityCode"/>
+        <result column="city_name" property="cityName"/>
+        <result column="county_id" property="countyCode"/>
+        <result column="county_name" property="countyName"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        code, name, parent_code, level
+    </sql>
+
+
+    <select id="queryDistinctArea" resultMap="AreaMap">
+    SELECT sa.`code` province_id,sa.`name` province_name,sa1.`code` city_id,sa1.`name` city_name,
+    sa2.`code` county_id,sa2.`name` county_name FROM sys_address sa
+    LEFT JOIN sys_address sa1 ON sa.`code` = sa1.`parent_code`
+    LEFT JOIN sys_address sa2 ON sa1.code = sa2.`parent_code`
+    WHERE sa2.`level` = 3
+    </select>
+</mapper>

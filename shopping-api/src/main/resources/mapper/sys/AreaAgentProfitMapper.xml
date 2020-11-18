@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.sys.AreaAgentProfitMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.sys.AreaAgentProfit">
+        <result column="id" property="id"/>
+        <result column="profit_ratio" property="profitRatio"/>
+        <result column="county_id" property="countyId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+        <result column="supplement_status" property="supplementStatus"/>
+        <result column="profit_type" property="profitType"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, profit_ratio, county_id, create_time, update_time, remark
+    </sql>
+    <insert id="insertAreaAgentProfit" parameterType="com.edaochina.shopping.domain.entity.sys.AreaAgentProfit">
+        insert into area_agent_profit(profit_ratio,county_id,remark,profit_type,supplement_status)
+        values (#{profitRatio},#{countyId},#{remark},#{profitType},#{supplementStatus})
+    </insert>
+    <select id="selectAreaAgentProfitByCountyId"
+            resultMap="BaseResultMap">
+         select *
+        from area_agent_profit
+        where county_id = #{countyId}
+        and profit_type = #{profitType}
+        limit 1
+    </select>
+    <update id="updateProfitRatioById">
+        update area_agent_profit
+        set profit_ratio = #{profitRatio}
+        where id = #{id}
+    </update>
+    <update id="updateProfitRatioByCountId">
+         update area_agent_profit
+        set profit_ratio = #{profitRatio}
+        where county_id = #{countyId}
+    </update>
+
+</mapper>

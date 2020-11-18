@@ -1,0 +1,9 @@
+com\edaochina\shopping\task\TaskApplication.class
+com\edaochina\shopping\task\trade\ShoppingCartTask.class
+com\edaochina\shopping\task\order\OrderTask.class
+com\edaochina\shopping\task\user\UpdateUserTask.class
+com\edaochina\shopping\task\order\ProfitCalcTask.class
+com\edaochina\shopping\task\goods\GoodsQrCodeTask.class
+com\edaochina\shopping\task\order\GoodsTask.class
+com\edaochina\shopping\task\user\SendMsgToUserTask.class
+com\edaochina\shopping\task\user\MerchantQrCodeTask.class

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.trade.ChainRecipientDetailDao">
+
+    <resultMap type="com.edaochina.shopping.domain.entity.trade.ChainRecipientDetail" id="ChainRecipientDetailMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="chainId" column="chain_id" jdbcType="INTEGER"/>
+        <result property="goodsId" column="goods_id" jdbcType="VARCHAR"/>
+        <result property="shipmentsStatus" column="shipments_status" jdbcType="INTEGER"/>
+        <result property="payStatus" column="pay_status" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="shipmentsTime" column="shipments_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="payImage" column="pay_image" jdbcType="VARCHAR"/>
+        <result property="recipients" column="recipients" jdbcType="VARCHAR"/>
+        <result property="consigneeAddress" column="consignee_address" jdbcType="VARCHAR"/>
+        <result property="receiptNumber" column="receipt_number" jdbcType="VARCHAR"/>
+
+        <result property="canApply" column="can_apply" jdbcType="INTEGER"/>
+        <result property="refuseReason" column="refuse_reason" jdbcType="VARCHAR"/>
+        <result property="merchantId" column="merchant_id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+    <resultMap type="com.edaochina.shopping.domain.vo.trade.ChainRecipientVo" id="ChainRecipientVo"
+               extends="ChainRecipientDetailMap">
+        <result property="goodsName" column="goods_name"/>
+        <result property="goodsPrice" column="goods_price"/>
+        <result property="num" column="num"/>
+        <result property="chamberlain" column="chamberlain"/>
+        <result property="bank" column="bank"/>
+        <result property="cardNumber" column="card_number"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="ChainRecipientDetailMap">
+        select
+          id, chain_id, goods_id, shipments_status, pay_status, create_time, shipments_time, remark, pay_image, recipients, consignee_address, receipt_number,can_apply
+        from cdshopping.chain_recipient_detail
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="ChainRecipientDetailMap">
+        select
+          id, chain_id, goods_id, shipments_status, pay_status, create_time, shipments_time, remark, pay_image, recipients, consignee_address, receipt_number
+        from cdshopping.chain_recipient_detail
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="ChainRecipientDetailMap">
+        select
+        id, chain_id, goods_id, shipments_status, pay_status, create_time, shipments_time, remark, pay_image,
+        recipients, consignee_address, receipt_number
+        from cdshopping.chain_recipient_detail
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="chainId != null">
+                and chain_id = #{chainId}
+            </if>
+            <if test="goodsId != null and goodsId != ''">
+                and goods_id = #{goodsId}
+            </if>
+            <if test="shipmentsStatus != null">
+                and shipments_status = #{shipmentsStatus}
+            </if>
+            <if test="payStatus != null">
+                and pay_status = #{payStatus}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="shipmentsTime != null">
+                and shipments_time = #{shipmentsTime}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="payImage != null and payImage != ''">
+                and pay_image = #{payImage}
+            </if>
+            <if test="recipients != null and recipients != ''">
+                and recipients = #{recipients}
+            </if>
+            <if test="consigneeAddress != null and consigneeAddress != ''">
+                and consignee_address = #{consigneeAddress}
+            </if>
+            <if test="receiptNumber != null and receiptNumber != ''">
+                and receipt_number = #{receiptNumber}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into cdshopping.chain_recipient_detail(chain_id, goods_id,merchant_id )
+        values (#{chainId}, #{goodsId},#{merchantId})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update cdshopping.chain_recipient_detail
+        <set>
+            <if test="chainId != null">
+                chain_id = #{chainId},
+            </if>
+            <if test="goodsId != null and goodsId != ''">
+                goods_id = #{goodsId},
+            </if>
+            <if test="shipmentsStatus != null">
+                shipments_status = #{shipmentsStatus},
+            </if>
+            <if test="payStatus != null">
+                pay_status = #{payStatus},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="shipmentsTime != null">
+                shipments_time = #{shipmentsTime},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="payImage != null and payImage != ''">
+                pay_image = #{payImage},
+            </if>
+            <if test="recipients != null and recipients != ''">
+                recipients = #{recipients},
+            </if>
+            <if test="consigneeAddress != null and consigneeAddress != ''">
+                consignee_address = #{consigneeAddress},
+            </if>
+            <if test="receiptNumber != null and receiptNumber != ''">
+                receipt_number = #{receiptNumber},
+            </if>
+
+            <if test="canApply != null">
+                can_apply = #{canApply},
+            </if>
+            <if test="refuseReason != null and refuseReason != ''">
+                refuse_reason = #{refuseReason},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from cdshopping.chain_recipient_detail where id = #{id}
+    </delete>
+
+    <select id="getChainRecipientList" resultMap="ChainRecipientVo">
+        select c.*,g.goods_name,g.goods_cost_price as goods_price,gci.buy_num as num,s.chamberlain,s.bank,s.card_number
+        from chain_recipient_detail c
+        left join goods g on c.goods_id = g.id
+        left join goods_collect_info gci on gci.goods_id = c.goods_id
+        left join supply_chain s on c.chain_id = s.id
+        <where>
+            <if test="userId != null and userId != ''">
+                and c.merchant_id = #{userId}
+            </if>
+            <if test="payStatus != null">
+                and c.pay_status = #{payStatus}
+            </if>
+            <if test="shipmentsStatus != null">
+                and c.shipments_status = #{shipmentsStatus}
+            </if>
+            <if test="beginTime != null">
+                and c.create_time > #{create_time}
+            </if>
+            <if test="endTime != null">
+                and #{endTime} > c.create_time
+            </if>
+            <if test="goodsId != null and goodsId != ''">
+                and c.goods_id like "%"#{goodsId}"%"
+            </if>
+            <if test="chainId != null and chainId !=''">
+                and c.chain_id like "%"#{chainId}"%"
+            </if>
+            <if test="merchantId != null and merchantId != ''">
+                and c.merchant_id like "%"#{merchantId}"%"
+            </if>
+        </where>
+        order by c.can_apply desc ,c.create_time desc ,c.pay_status
+    </select>
+
+</mapper>

@@ -1,0 +1,24 @@
+server:
+  port: 8091
+  tomcat:
+    uri-encoding: UTF-8
+    # HTTPS
+    remote-ip-header: x-forwarded-for
+    protocol-header: x-forwarded-proto
+    port-header: X-Forwarded-Port
+  use-forward-headers: true
+spring:
+  # Jackson
+  jackson:
+    time-zone: GMT+8
+  profiles:
+    # 生产
+    # active: config
+    # 测试
+    active: test
+    # 开发
+    # active: dev
+logging:
+  config: classpath:log4j2.yml
+  level:
+      com.edaochina.shopping.api.dao: debug

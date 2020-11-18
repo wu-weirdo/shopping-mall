@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.order.OrderErrorImgsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.order.OrderErrorImgs">
+        <id column="id" property="id"/>
+        <result column="order_error_id" property="orderErrorId"/>
+        <result column="img_url" property="imgUrl"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, order_error_id, img_url, create_time, update_time
+    </sql>
+    <insert id="insertImg">
+        insert into order_error_imgs(order_error_id, img_url)
+        values(#{orderErrorId},#{imgUrl})
+    </insert>
+    <select id="selectByOrderErrorId" resultType="java.lang.String">
+        select img_url
+        from order_error_imgs
+        where order_error_id = #{orderErrorId}
+    </select>
+
+</mapper>

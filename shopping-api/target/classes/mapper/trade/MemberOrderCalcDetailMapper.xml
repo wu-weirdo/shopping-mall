@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.trade.MemberOrderCalcDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.trade.MemberOrderCalcDetail">
+        <id column="id" property="id"/>
+        <result column="member_order_id" property="memberOrderId"/>
+        <result column="member_type" property="memberType"/>
+        <result column="profit_type" property="profitType"/>
+        <result column="user_id" property="userId"/>
+        <result column="profit_result" property="profitResult"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+        <result column="supplement_type" property="supplementType"/>
+        <result column="supplement_status" property="supplementStatus"/>
+        <result column="county_id" property="county_id"/>
+        <result column="member_price" property="memberPrice"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, member_order_id, member_type, profit_type, user_id, profit_result, create_time, update_time,remark,supplement_type,supplement_status,county_id
+    </sql>
+    <select id="selectMemberOrderCalcDetailByProfitType"
+            resultMap="BaseResultMap">
+        select *
+        from member_order_calc_detail
+        <where>
+            <if test="profitType != null and profitType != ''">
+                and profit_type = #{profitType}
+            </if>
+        </where>
+    </select>
+    <select id="queryUnSupplement"
+            resultMap="BaseResultMap">
+        select *
+        from member_order_calc_detail
+        where county_id = #{countyCode}
+        and member_type = #{memberType}
+        and supplement_type = #{supplementType}
+        and supplement_status = 0
+    </select>
+
+    <insert id="insert" parameterType="com.edaochina.shopping.domain.entity.trade.MemberOrderCalcDetail">
+      insert into member_order_calc_detail(member_order_id,member_type,profit_type,user_id,profit_result,supplement_type,supplement_status,county_id,member_price)
+      values (#{memberOrderId},#{memberType},#{profitType},#{userId},#{profitResult},#{supplementType},#{supplementStatus},#{countyId},#{memberPrice})
+    </insert>
+
+    <update id="setToSupplemented">
+        update member_order_calc_detail set supplement_status = 1
+        where id = #{id}
+    </update>
+
+    <select id="queryUserMemberOrderCount" parameterType="com.edaochina.shopping.domain.dto.order.MemberOrderCountDTO"
+            resultType="com.edaochina.shopping.domain.vo.order.SysMemberOrderCountVO">
+        select m.month,m.profitPrice,n.memberNum,n.unMemberNum from (
+        SELECT SUM(mocd.`profit_result`) profitPrice
+        ,DATE_FORMAT(mocd.`create_time`,'%Y%m') month
+        FROM member_order_calc_detail mocd
+        where mocd.`user_id` = #{userId}
+        and mocd.`profit_type` = 2
+        and mocd.member_type = #{profitType}
+        GROUP BY DATE_FORMAT(mocd.`create_time`,'%Y%m')
+        ) m
+        inner JOIN
+        <choose>
+            <when test="profitType==1">
+                (
+                SELECT SUM(CASE WHEN u.`member_type`= 1 THEN 1 ELSE 0 END) memberNum
+                ,SUM(CASE WHEN u.`member_type`= 1 THEN 0 ELSE 1 END) unMemberNum
+                ,CASE WHEN u.`member_type`= 1 THEN DATE_FORMAT(DATE_ADD(u.`member_time`,INTERVAL -1 YEAR),'%Y%m')
+                ELSE DATE_FORMAT(u.`create_time`,'%Y%m') END AS month
+                FROM sys_user u
+                INNER JOIN (
+                select
+                aci.`county_code`,sua.id
+                from sys_user_agent sua inner join agent_county_info aci
+                on sua.id = aci.agent_id ) a ON u.`county_code` = a.`county_code`
+                where a.`id` = #{userId}
+                GROUP BY month
+                ) n
+            </when>
+            <otherwise>
+                (
+                SELECT SUM(CASE WHEN u.`member_type`= 1 THEN 1 ELSE 0 END) memberNum
+                ,SUM(CASE WHEN u.`member_type`= 1 THEN 0 ELSE 1 END) unMemberNum
+                ,CASE WHEN u.`member_type`= 1 THEN DATE_FORMAT(DATE_ADD(u.`member_time`,INTERVAL -1 YEAR),'%Y%m')
+                ELSE DATE_FORMAT(u.`create_time`,'%Y%m') END AS month
+                FROM sys_user_merchant u
+                INNER JOIN (
+                select aci.`county_code`,sua.id
+                from sys_user_agent sua inner join agent_county_info aci
+                on sua.id = aci.agent_id ) a ON u.`county_id` = a.`county_code`
+                where a.`id` = #{userId}
+                GROUP BY month
+                ) n
+            </otherwise>
+        </choose>
+        on m.month = n.month
+    </select>
+
+    <select id="selectProfitGroupByMonth" parameterType="com.edaochina.shopping.domain.dto.order.MemberOrderCountDTO"
+            resultType="com.edaochina.shopping.domain.vo.order.SysMemberOrderMonthVO">
+        SELECT sum(detail.profit_result)                 AS profitPrice,
+               count(1)                                  AS memberNum,
+               DATE_FORMAT(detail.`create_time`, '%Y%m') AS month,
+               detail.member_type                        AS orderType,
+               (
+                   SELECT sum(apply_money)
+                   FROM withdrawal_record w
+                   WHERE w.user_id = detail.user_id
+                     AND DATE_FORMAT(w.`apply_time`, '%Y%m') = month
+                     AND w.`status` = 1
+               )                                         AS withdrawal
+        FROM member_order_calc_detail detail
+                 LEFT JOIN member_order o ON o.out_order_no = detail.member_order_id
+        WHERE o.pay_status = 1
+          AND detail.supplement_type = 0
+          AND detail.user_id = #{userId}
+        GROUP BY DATE_FORMAT(detail.`create_time`, '%Y%m'),
+                 detail.member_type;
+    </select>
+
+    <select id="getAgentCalcCountInfo" resultType="java.math.BigDecimal">
+      select sum(profit_result)
+      from member_order_calc_detail
+      where create_time <![CDATA[ > ]]> #{startTime}
+      and create_time <![CDATA[ < ]]> #{endTime}
+      and user_id = #{agentId}
+      and profit_type = 2
+    </select>
+
+    <select id="getPartenerCalcCountInfo" resultType="java.math.BigDecimal">
+         select sum(profit_result)
+      from member_order_calc_detail
+      where create_time <![CDATA[ > ]]> #{startTime}
+      and create_time <![CDATA[ < ]]> #{endTime}
+      and user_id = #{partenerId}
+      and profit_type = 4
+    </select>
+</mapper>

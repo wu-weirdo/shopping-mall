@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.order.OrderErrorHandleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.order.OrderErrorHandle">
+        <id column="id" property="id"/>
+        <result column="exception_order_id" property="exceptionOrderId"/>
+        <result column="handle_user_id" property="handleUserId"/>
+        <result column="handle_user_role" property="handleUserRole"/>
+        <result column="handle_before_status" property="handleBeforeStatus"/>
+        <result column="handle_after_status" property="handleAfterStatus"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, exception_order_id, handle_user_id, handle_user_role, handle_before_status, handle_after_status, remark
+    </sql>
+    <insert id="insertOrderErrorHandle">
+        insert into order_error_handle(exception_order_id,handle_user_id,handle_user_role,handle_before_status,handle_after_status)
+        values (#{exceptionOrderId},#{handleUserId},#{handleUserRole},#{handleBeforeStatus},#{handleAfterStatus})
+    </insert>
+
+</mapper>

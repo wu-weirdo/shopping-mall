@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.order.ApprovalRecordMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.order.ApprovalRecord">
+        <id column="id" property="id"/>
+        <result column="shop_id" property="shopId"/>
+        <result column="goods_id" property="goodsId"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="goods_type_id" property="goodsTypeId"/>
+        <result column="goods_subclass_id" property="goodsSubclassId"/>
+        <result column="goods_price" property="goodsPrice"/>
+        <result column="goods_retail_price" property="goodsRetailPrice"/>
+        <result column="goods_cost_price" property="goodsCostPrice"/>
+        <result column="goods_num" property="goodsNum"/>
+        <result column="approval_flag" property="approvalFlag"/>
+        <result column="reason" property="reason"/>
+        <result column="approval_time" property="approvalTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, shop_id, goods_id, goods_name, goods_type_id, goods_subclass_id, goods_price, goods_retail_price, goods_cost_price, goods_num, approval_flag, reason, approval_time
+    </sql>
+
+    <select id="getLastAcceptApprovalRecord" resultMap="BaseResultMap">
+        select *
+        from approval_record
+        where goods_id = #{goodsId}
+        and approval_flag = 30
+        order by approval_time desc
+        limit 1
+    </select>
+
+</mapper>

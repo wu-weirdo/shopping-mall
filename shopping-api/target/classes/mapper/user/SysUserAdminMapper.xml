@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.user.SysUserAdminMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.user.SysUserAdmin">
+        <id column="id" property="id"/>
+        <result column="account" property="account"/>
+        <result column="password" property="password"/>
+        <result column="salt" property="salt"/>
+        <result column="name" property="name"/>
+        <result column="phone" property="phone"/>
+        <result column="role_id" property="roleId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, account, password, salt, name, status, phone, role_id, create_time, update_time, remark
+    </sql>
+    <select id="selectRoleId" resultType="java.lang.Integer">
+        select role_id
+        from sys_user_admin
+        where account = #{account}
+    </select>
+    <select id="selectIdByRole" resultType="java.lang.String">
+        select id
+        from sys_user_admin
+        where role_id = #{roleId}
+    </select>
+    <update id="updateRoleId">
+        update sys_user_admin
+        set role_id = #{roleId}
+        where id = #{id}
+    </update>
+</mapper>

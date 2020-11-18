@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.sys.SysButtonMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.sys.SysButton">
+        <id column="id" property="id"/>
+        <result column="button_alias" property="buttonAlias"/>
+        <result column="button_function" property="buttonFunction"/>
+        <result column="menu_id" property="menuId"/>
+        <result column="parent_menu_id" property="parentMenuId"/>
+    </resultMap>
+    <resultMap id="SysButtonVOMap" type="com.edaochina.shopping.domain.vo.sys.SysButtonVO">
+        <id column="id" property="id"/>
+        <result column="button_alias" property="buttonAlias"/>
+        <result column="button_function" property="buttonFunction"/>
+        <result column="menu_id" property="menuId"/>
+        <result column="parent_menu_id" property="parentMenuId"/>
+        <result column="is_checked" property="isChecked"/>
+    </resultMap>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, button_alias, button_function, menu_id, parent_menu_id
+    </sql>
+    <select id="selectByAccountId" resultMap="SysButtonVOMap">
+        SELECT sb.*,
+               IF(exists(
+                          SELECT 1
+                          FROM sys_user_button_permission sbp
+                          WHERE sbp.account_id = #{accountId}
+                            and sb.id = sbp.button_id), 1, 0) is_checked
+        FROM sys_button sb
+        ORDER BY parent_menu_id, id
+    </select>
+    <select id="buttonList" resultMap="SysButtonVOMap">
+    SELECT
+	sb.*,
+    CASE WHEN exists(
+    SELECT 1
+    FROM sys_button_permission sbp
+    WHERE sbp.role_id = #{roleId}
+    and sb.id = sbp.button_id )
+    THEN 1 ELSE 0
+	END is_checked
+    FROM sys_button sb
+    ORDER BY  parent_menu_id, id
+    </select>
+    <select id="selectById" resultMap="BaseResultMap">
+        select *
+        from sys_button
+        where id = #{id}
+    </select>
+    <select id="buttonAliasList" resultType="java.lang.String">
+        select sb.button_alias
+        from sys_button sb
+        left join sys_button_permission sbp
+        on sbp.button_id = sb.id
+        where sbp.role_id = #{roleId}
+    </select>
+    <select id="buttonUserAliasList" resultType="java.lang.String">
+        select sb.button_alias
+        from sys_button sb
+                 left join sys_user_button_permission p
+                           on p.button_id = sb.id
+        where p.account_id = #{accountId}
+    </select>
+    <insert id="insertButton">
+        insert into sys_button(button_alias, button_function, menu_id, parent_menu_id)
+        values (#{buttonAlias}, #{buttonFunction}, #{menuId}, #{parentMenuId})
+    </insert>
+    <select id="allButtonAlias" resultType="java.lang.String">
+         select button_alias
+        from sys_button
+    </select>
+
+</mapper>

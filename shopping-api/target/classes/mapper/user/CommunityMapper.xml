@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.user.CommunityMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.user.Community">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="longitude" property="longitude"/>
+        <result column="latitude" property="latitude"/>
+        <result column="address" property="address"/>
+        <result column="rider_id" property="riderId"/>
+        <result column="rider_name" property="riderName"/>
+        <result column="province_id" property="provinceId"/>
+        <result column="province_name" property="provinceName"/>
+        <result column="city_id" property="cityId"/>
+        <result column="city_name" property="cityName"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="county_id" property="countyId"/>
+        <result column="county_name" property="countyName"/>
+    </resultMap>
+
+    <resultMap id="AreaMap" type="com.edaochina.shopping.domain.vo.sys.SysHasAgenAreaVo">
+        <result column="province_id" property="provinceCode"/>
+        <result column="province_name" property="provinceName"/>
+        <result column="city_id" property="cityCode"/>
+        <result column="city_name" property="cityName"/>
+        <result column="county_id" property="countyCode"/>
+        <result column="county_name" property="countyName"/>
+    </resultMap>
+
+
+    <resultMap id="VoMap" type="com.edaochina.shopping.domain.vo.user.CommunityListVO">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="address" property="address"/>
+        <result column="province_name" property="provinceName"/>
+        <result column="city_name" property="cityName"/>
+        <result column="create_time" property="createTime"/>
+        <result column="county_name" property="countyName"/>
+        <result column="merchant_num" property="merchantNum"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, longitude, latitude, address, province_id, province_name, city_id, city_name, create_time,
+        update_time,county_id,county_name
+    </sql>
+
+    <sql id="distance">
+        ROUND
+        (6378.138*2*ASIN(SQRT(POW(SIN(
+            (#{latitude}*pi()/180-latitude*pi()/180)/2),2)+cos(#{latitude}*pi()/180)*cos(latitude*pi()/180)*
+            pow(sin(
+            (#{longitude}*pi()/180-longitude*pi()/180)/2),2)))*1000)
+    </sql>
+
+    <select id="selectByCoord" parameterType="com.edaochina.shopping.domain.dto.user.CommunityAppListDTO"
+            resultType="com.edaochina.shopping.domain.vo.user.CommunityAppListVO">
+        SELECT<include refid="Base_Column_List"/>,distance FROM
+        (SELECT
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="distance"/>
+        AS distance
+        FROM cdshopping.community ) AS result
+        WHERE result.distance <![CDATA[ <= ]]> #{maxDistinct}
+        <if test="countyId != null">
+            and result.county_id = #{countyId}
+        </if>
+        <if test="name != null and name != ''">
+            and result.name like "%"#{name}"%"
+        </if>
+        ORDER BY result.distance
+    </select>
+
+    <select id="selectInId" parameterType="com.edaochina.shopping.domain.dto.user.CommunitySelectDTO"
+            resultType="com.edaochina.shopping.domain.vo.user.CommunityAppListVO">
+        SELECT<include refid="Base_Column_List"/>, distance FROM
+        (SELECT
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="distance"/>
+        AS distance
+        FROM cdshopping.community ) AS result
+        WHERE 1=1
+        <if test="latitude != null and longitude != null
+            and maxDistinct > 0 and countyId == null">
+            and result.distance <![CDATA[ <= ]]> #{maxDistinct}
+        </if>
+        <if test="countyId != null">
+            and result.county_id = #{countyId}
+        </if>
+        <if test="name != null and name != ''">
+            and result.name like "%"#{name}"%"
+        </if>
+        ORDER BY result.distance
+        <if test="countyId != null">
+            limit 10
+        </if>
+    </select>
+
+    <select id="selectByHistory" parameterType="com.edaochina.shopping.domain.dto.user.CommunitySelectDTO"
+            resultType="com.edaochina.shopping.domain.vo.user.CommunityAppListVO">
+        SELECT<include refid="Base_Column_List"/>,
+        <include refid="distance"/>
+        AS distance
+        FROM cdshopping.community
+        <if test="historyIds != null">
+            WHERE id IN
+            <foreach collection="historyIds" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+        ORDER BY distance
+    </select>
+
+    <select id="getSysListByCountyId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from cdshopping.community
+        where county_id = #{countyId}
+    </select>
+
+    <select id="getAgentList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from cdshopping.community
+        where county_id in (select county_code from cdshopping.agent_county_info where del_flg = 0)
+    </select>
+
+    <select id="queryDistinctArea" resultMap="AreaMap">
+        select distinct province_id
+                      , province_name
+                      , city_id
+                      , city_name
+                      , county_id
+                      , county_name
+        from community
+    </select>
+    <delete id="deleteCommunity">
+        delete
+        from community
+        where community.id = #{id}
+    </delete>
+
+    <select id="queryCommunity" resultType="com.edaochina.shopping.domain.vo.user.CommunityAppListVO">
+        select *,
+        <include refid="distance"/>
+        as distance
+        from community
+        where county_id = #{countyCode}
+        <if test="search != null and search != ''">
+            and name like "%"#{search}"%"
+        </if>
+        order by distance
+        limit 10
+    </select>
+
+    <select id="selectInIdAndHasGoods" resultType="com.edaochina.shopping.domain.vo.user.CommunityAppListVO">
+        SELECT<include refid="Base_Column_List"/>, distance FROM
+        (SELECT
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="distance"/>
+        AS distance
+        FROM cdshopping.community ) AS result
+        WHERE 1=1
+        <if test="latitude != null and longitude != null
+            and maxDistinct > 0 and countyId == null">
+            and result.distance <![CDATA[ <= ]]> #{maxDistinct}
+        </if>
+        <if test="countyId != null">
+            and result.county_id = #{countyId}
+        </if>
+        <if test="name != null and name != ''">
+            and result.name like "%"#{name}"%"
+        </if>
+        and exists (
+        select 1
+        from goods g,sys_merchant_community smc
+        where g.shop_id = smc.merchant_id
+        and smc.community = result.id
+        and g.putaway_time <![CDATA[ < ]]> now()
+        and g.last_valid_time > now()
+        and g.collect_flag = 0
+        and g.delete_flag = 10
+        and g.approval_flag = 30
+        and g.putaway_status = 10
+        )
+        ORDER BY result.distance
+        <if test="countyId != null">
+            limit 10
+        </if>
+    </select>
+
+    <select id="querySysCommunitys" resultMap="VoMap">
+        select c.*,smc.merchant_num
+        from community c
+        left join (
+        select count(1) merchant_num, community
+        from sys_merchant_community
+        where delete_flag = 10
+        group by community
+        ) smc on smc.community = c.id
+        <where>
+            <if test="name != null and name !=''">
+                and c.name like "%"#{name}"%"
+            </if>
+            <if test="address != null and address != ''">
+                and c.address like "%"#{address}"%"
+            </if>
+            <if test="beginTime != null ">
+                and c.create_time > #{beginTime}
+            </if>
+            <if test="endTime != null">
+                and #{endTime} > c.create_time
+            </if>
+            <choose>
+                <when test="roleId != null and roleId == '4'.toString()">
+                    and exists (
+                    select 1
+                    from agent_county_info aci
+                    where aci.agent_id = #{userId}
+                    and aci.county_code = c.county_id
+                    )
+                </when>
+                <when test="roleId != null and roleId == '6'.toString()">
+                    and exists (
+                    select 1
+                    from community_partener_county_info aci
+                    where aci.community_partener_id = #{userId}
+                    and aci.county_code = c.county_id
+                    )
+                </when>
+            </choose>
+        </where>
+        order by c.create_time desc
+    </select>
+</mapper>
+

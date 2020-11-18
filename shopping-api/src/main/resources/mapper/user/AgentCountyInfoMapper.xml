@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.user.AgentCountyInfoMapper">
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.user.AgentCountyInfo">
+        <id column="id" property="id"/>
+        <result column="agent_id" property="agentId"/>
+        <result column="province_code" property="provinceCode"/>
+        <result column="province_name" property="provinceName"/>
+        <result column="city_code" property="cityCode"/>
+        <result column="city_name" property="cityName"/>
+        <result column="county_code" property="countyCode"/>
+        <result column="county_name" property="countyName"/>
+        <result column="del_flg" property="delFlg"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,agentId,provinceCode,provinceName,cityCode,cityName,countyCode,countyName,createTime,delFlg,updateTime,remark
+    </sql>
+    <insert id="insertAgentCounty">
+        insert into agent_county_info(agent_id,province_code,province_name,city_code,city_name,county_code,county_name)
+        values(#{agentId},#{provinceCode},#{provinceName},#{cityCode},#{cityName},#{countyCode},#{countyName})
+    </insert>
+    <delete id="deleteAgentCounty">
+        delete from agent_county_info
+        where agent_id = #{agentId}
+    </delete>
+    <select id="agentCountyList" resultMap="BaseResultMap">
+        select *
+        from agent_county_info
+        where agent_id = #{agentId}
+    </select>
+
+    <select id="checkAgentByCountyId" resultType="java.lang.Integer">
+        select count(*)
+        from agent_county_info
+        where county_code in
+        <foreach collection="agentAreaInfos" open="(" close=")" separator="," item="agentAreaInfo">
+            <![CDATA[ #{agentAreaInfo.countyCode} ]]>
+        </foreach>
+        <if test="agentId != null and agentId != ''">
+            and agent_id != #{agentId}
+        </if>
+    </select>
+    <select id="queryProvinceAndCity" resultMap="BaseResultMap">
+        select distinct province_code,province_name,city_code,city_name
+        from agent_county_info
+    </select>
+    <select id="queryCountyByCity" resultMap="BaseResultMap">
+        select county_code,county_name
+        from agent_county_info
+        where city_code = #{cityCode}
+    </select>
+
+    <select id="queryByCountyId" resultMap="BaseResultMap">
+        select * from agent_county_info
+        where county_code = #{countyCode}
+    </select>
+
+    <delete id="removeErrorCountyInfo">
+        delete from agent_county_info
+        where county_code not in
+        <foreach collection="agentAreaInfos" open="(" close=")" separator="," item="agentAreaInfo">
+            <![CDATA[ #{agentAreaInfo.countyCode} ]]>
+        </foreach>
+        <if test="agentId != null and agentId != ''">
+            and agent_id != #{agentId}
+        </if>
+    </delete>
+</mapper>

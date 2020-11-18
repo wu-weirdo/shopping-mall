@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.trade.PayRefundInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.trade.PayRefundInfo">
+        <id column="id" property="id"/>
+        <result column="transaction_id" property="transactionId"/>
+        <result column="out_trade_no" property="outTradeNo"/>
+        <result column="out_refund_no" property="outRefundNo"/>
+        <result column="total_fee" property="totalFee"/>
+        <result column="refund_fee" property="refundFee"/>
+        <result column="refund_result" property="refundResult"/>
+        <result column="return_result" property="returnResult"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="remark" property="remark"/>
+        <!-- 2019.10.08 添加 -->
+        <result column="refund_apply_id" property="refundApplyId"/>
+        <result column="call_back_result" property="callBackResult"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, transaction_id, out_trade_no, out_refund_no, total_fee, refund_fee, refund_result, return_result
+        , update_time, create_time, remark, refund_apply_id, call_back_result
+    </sql>
+    <insert id="insertRefundInfo">
+        insert into pay_refund_info(transaction_id,out_trade_no,out_refund_no,total_fee,refund_fee,refund_result,return_result,refund_apply_id)
+        values(#{transactionId},#{outTradeNo},#{outRefundNo},#{totalFee},#{refundFee},#{refundResult},#{returnResult},#{refundApplyId})
+    </insert>
+
+    <select id="queryByOutTradeNo" resultMap="BaseResultMap">
+        select *
+        from pay_refund_info
+        where out_refund_no = #{outRefundNo}
+    </select>
+
+    <update id="updateRefundStatus">
+      update pay_refund_info
+      set refund_result = #{refundStatus},call_back_result = #{callBackResult}
+      where id = #{id}
+    </update>
+</mapper>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.trade.PayRecordInfoMapper">
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.trade.PayRecordInfo">
+        <id column="id" property="id"/>
+        <result column="prepay_id" property="prepayId"/>
+        <result column="return_pay_info" property="returnPayInfo"/>
+        <result column="pay_user_id" property="payUserId"/>
+        <result column="pay_type" property="payType"/>
+        <result column="pay_status" property="payStatus"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+        <result column="pay_money" property="payMoney"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,prepayId,returnPayInfo,payUserId,payType,payStatus,createTime,updateTime,remark
+    </sql>
+    <insert id="insertPayRecord">
+        insert into pay_record_info(id,prepay_id,pay_user_id,pay_type,pay_money)
+        values(#{id},#{prepayId},#{payUserId},#{payType},#{payMoney})
+    </insert>
+    <update id="updatePayRecord">
+        update pay_record_info
+        set return_pay_info = #{returnPayInfo},pay_status = #{payStatus}
+        where id = #{id}
+    </update>
+    <select id="queryPayRecordById" resultMap="BaseResultMap">
+        select *
+        from pay_record_info
+        where id = #{id}
+    </select>
+
+</mapper>

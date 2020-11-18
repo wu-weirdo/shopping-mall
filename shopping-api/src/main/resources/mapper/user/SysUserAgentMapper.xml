@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.user.SysUserAgentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.user.SysUserAgent">
+        <id column="id" property="id"/>
+        <result column="account" property="account"/>
+        <result column="phone" property="phone"/>
+        <result column="password" property="password"/>
+        <result column="salt" property="salt"/>
+        <result column="name" property="name"/>
+        <result column="photo" property="photo"/>
+        <result column="identity_no" property="identityNo"/>
+        <result column="status" property="status"/>
+        <result column="balance_money" property="balanceMoney"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="openid" property="openid"/>
+        <result column="payment" property="payment"/>
+        <result column="live_code" property="liveCode"/>
+    </resultMap>
+
+    <resultMap id="AreaMap" type="com.edaochina.shopping.domain.vo.sys.SysHasAgenAreaVo">
+        <result column="province_code" property="provinceCode"/>
+        <result column="province_name" property="provinceName"/>
+        <result column="city_code" property="cityCode"/>
+        <result column="city_name" property="cityName"/>
+        <result column="county_code" property="countyCode"/>
+        <result column="county_name" property="countyName"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, account, phone, password, salt, name, photo, identity_no, status, balance_money, create_time, update_time, openid, payment, live_code
+    </sql>
+
+    <select id="queryDistinctArea" resultMap="AreaMap">
+        select distinct province_code ,province_name ,city_code
+        ,city_name ,county_code ,county_name
+        from agent_county_info
+        where del_flg = 0
+    </select>
+    <select id="queryAgentByCounty" resultMap="BaseResultMap">
+        select *
+        from sys_user_agent sua left join agent_county_info aci
+        on sua.id = aci.agent_id
+        where aci.county_code = #{countyId}
+    </select>
+
+    <select id="queryCountByAgentDTO" resultType="java.lang.Integer">
+        select count(1)
+        from sys_user_agent sua
+        where sua.status = 0
+        <if test="name != null and name != ''">
+            and sua.name like "%"#{name}"%"
+        </if>
+        <if test="phone != null and phone != ''">
+            and sua.phone like "%"#{phone}"%"
+        </if>
+        <if test="beginTime != null">
+            and sua.create_time >= #{beginTime}
+        </if>
+        <if test="endTime != null ">
+            and sua.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="cityCode != null and cityCode != ''">
+            and exists (
+            select 1
+            from agent_county_info aci
+            where aci.agent_id = sua.id
+            and aci.city_code = #{cityCode}
+            )
+        </if>
+        <if test="countyCode != null and countyCode != ''">
+            and exists (
+            select 1
+            from agent_county_info aci
+            where aci.agent_id = sua.id
+            and aci.county_code = #{countyCode}
+            )
+        </if>
+    </select>
+
+
+    <select id="queryByAgentDTO" resultMap="BaseResultMap"
+            parameterType="com.edaochina.shopping.domain.dto.user.AgentDTO">
+        select *
+        from sys_user_agent sua
+        where sua.status = 0
+        <if test="name != null and name != ''">
+            and sua.name like "%"#{name}"%"
+        </if>
+        <if test="phone != null and phone != ''">
+            and sua.phone like "%"#{phone}"%"
+        </if>
+        <if test="beginTime != null ">
+            and sua.create_time >= #{beginTime}
+        </if>
+        <if test="endTime != null ">
+            and sua.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="cityCode != null and cityCode != ''">
+            and exists (
+            select 1
+            from agent_county_info aci
+            where aci.agent_id = sua.id
+            and aci.city_code = #{cityCode}
+            )
+        </if>
+        <if test="countyCode != null and countyCode != ''">
+            and exists (
+            select 1
+            from agent_county_info aci
+            where aci.agent_id = sua.id
+            and aci.county_code = #{countyCode}
+            )
+        </if>
+        order by sua.create_time desc
+        limit #{startNum},#{pageSize}
+    </select>
+
+    <update id="updateBalanceMoney">
+        update sys_user_agent
+        set balance_money = balance_money + #{money}
+        where id = #{userId}
+        and  balance_money + #{money} >= 0
+    </update>
+
+</mapper>

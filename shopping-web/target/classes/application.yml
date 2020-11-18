@@ -1,0 +1,34 @@
+server:
+  port: 8090
+  tomcat:
+    uri-encoding: UTF-8
+    # HTTPS
+    remote-ip-header: x-forwarded-for
+    protocol-header: x-forwarded-proto
+    port-header: X-Forwarded-Port
+  use-forward-headers: true
+spring:
+  # Jackson
+  jackson:
+    time-zone: GMT+8
+  profiles:
+    # 生产
+    #active: config
+    # 测试
+    # active: test
+    # 开发
+    active: dev
+  flyway:
+    clean-disabled: true #禁用clean操作
+    baseline-on-migrate: true #初始化时如果不存在迁移记录表，默认新建一个
+    locations: classpath:db/migration
+# PageHelper分页插件
+pagehelper:
+  helperDialect: mysql
+  reasonable: false
+  supportMethodsArguments: true
+  params: count=countSql
+logging:
+  config: classpath:log4j2.yml
+  level:
+      com.edaochina.shopping.api.dao: debug

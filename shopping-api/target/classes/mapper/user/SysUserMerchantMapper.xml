@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.user.SysUserMerchantMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.user.SysUserMerchant">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="account" property="account"/>
+        <result column="phone" property="phone"/>
+        <result column="password" property="password"/>
+        <result column="salt" property="salt"/>
+        <result column="name" property="name"/>
+        <result column="identity_no" property="identityNo"/>
+        <result column="address" property="address"/>
+        <result column="longitude" property="longitude"/>
+        <result column="latitude" property="latitude"/>
+        <result column="qr_code" property="qrCode"/>
+        <result column="status" property="status"/>
+        <result column="balance_money" property="balanceMoney"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="county_id" property="countyId"/>
+        <result column="openid" property="openid"/>
+        <result column="law_consumer_id" property="lawConsumerId"/>
+        <result column="house_number" property="houseNumber"/>
+        <result column="start_business" property="startBusiness"/>
+        <result column="end_business" property="endBusiness"/>
+        <!-- 2019.10.10 新加内容 -->
+        <result column="total_income" property="totalIncome"/>
+        <result column="league" property="league"/>
+    </resultMap>
+
+
+    <resultMap id="MerchantVOMap" type="com.edaochina.shopping.domain.vo.user.MerchantVO">
+        <id column="id" property="id"/>
+        <result column="qr_code" property="qrCode"/>
+        <result column="account" property="account"/>
+        <result column="phone" property="phone"/>
+        <result column="name" property="name"/>
+        <result column="address" property="address"/>
+        <result column="title" property="title"/>
+        <result column="longitude" property="longitude"/>
+        <result column="latitude" property="latitude"/>
+        <result column="identity_no" property="identityNo"/>
+        <result column="create_time" property="createTime"/>
+        <result column="order_Count" property="orderCount"/>
+        <result column="total_profit" property="totalProfit"/>
+        <result column="goods_count" property="goodsCount"/>
+        <result column="community" property="community"/>
+        <result column="member_type" property="memberType"/>
+        <result column="member_num" property="memberNum"/>
+        <result column="member_time" property="memberTime"/>
+        <result column="county_id" property="countyId"/>
+        <result column="check_status" property="checkStatus"/>
+        <result column="status" property="status"/>
+        <result column="start_business" property="startBusiness"/>
+        <result column="end_business" property="endBusiness"/>
+        <result column="league" property="league"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, title, house_number, account, phone, password, salt, name, identity_no, address, longitude, latitude,
+        qr_code, community, status, balance_money, create_time, update_time, county_id, openid, law_consumer_id, league
+    </sql>
+
+
+    <select id="queryMemberNumByCountId" resultType="java.lang.Integer">
+        select count(1)
+        from sys_user_merchant
+        where county_id = #{countyId}
+        and member_type = 1
+        and status != 2
+    </select>
+
+    <select id="queryByPhone" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_user_merchant
+        where phone = #{phone}
+        and status != 2
+    </select>
+    <update id="updateMerchant">
+        update sys_user_merchant
+        set status = #{status}
+        where id = #{id}
+    </update>
+
+    <select id="queryNoQrCode" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_user_merchant
+        where status != 2
+        and qr_code = ''
+    </select>
+    <select id="merchantList" resultMap="MerchantVOMap">
+        select smc.community
+        ,sm.id
+        ,sm.qr_code
+        ,sm.account
+        ,sm.phone
+        ,sm.name
+        ,sm.address
+        ,sm.title
+        ,sm.longitude
+        ,sm.latitude
+        ,sm.identity_no
+        ,sm.create_time
+        ,sm.member_type
+        ,sm.member_num
+        ,sm.member_time
+        ,sm.county_id
+        ,sm.check_status
+        ,sm.status
+        ,sm.start_business
+        ,sm.end_business
+        ,sm.total_income as total_profit
+        ,sm.league
+        from sys_user_merchant sm
+        left join
+        (
+        select GROUP_CONCAT(community) community,merchant_id
+        from sys_merchant_community
+        <if test="communityId != null and communityId != ''">
+            where community = #{communityId}
+        </if>
+        group by merchant_id
+        )
+        smc on sm.id = smc.merchant_id
+        <!-- left join trade_detail_merchant t on sm.id = t.merchant_id -->
+        where sm.status != 2
+        <if test="id != null and id != ''">
+            and sm.id = #{id}
+        </if>
+        <if test="name != null and name != ''">
+            and sm.name like "%"#{name}"%"
+        </if>
+
+        <if test="invitatCode != null and invitatCode != ''">
+            and sm.invitat_code = #{invitatCode}
+        </if>
+
+        <if test="phone != null and phone != ''">
+            and sm.phone like "%"#{phone}"%"
+        </if>
+        <if test="title != null and title != ''">
+            and sm.title like "%"#{title}"%"
+        </if>
+        <if test="beginTime != null ">
+            and sm.create_time <![CDATA[ >= ]]> #{beginTime}
+        </if>
+        <if test="endTime != null ">
+            and sm.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="communityId != null and communityId != ''">
+            and smc.community = #{communityId}
+        </if>
+        <if test="countyId != null and countyId != ''">
+            and sm.county_id = #{countyId}
+        </if>
+        <if test="roleId == '4'.toString()">
+            and sm.county_id in (
+            select aci.county_code
+            from agent_county_info aci
+            where aci.agent_id = #{userId}
+            )
+        </if>
+        <if test="memberType != null and memberType != ''">
+            and sm.member_type = #{memberType}
+        </if>
+        <if test="roleId == '6'.toString()">
+            and sm.community_user_id = #{userId}
+        </if>
+        group by sm.id
+        order by sm.create_time desc
+        limit ${pages.begIndex},${pages.pageSize}
+    </select>
+    <select id="merchantCount" resultType="java.lang.Integer">
+        select count(1)
+        from sys_user_merchant sm
+        left join
+        (
+        select GROUP_CONCAT(community) community,merchant_id
+        from sys_merchant_community
+        <if test="communityId != null and communityId != ''">
+            where community = #{communityId}
+        </if>
+        group by merchant_id
+        )
+        smc on sm.id = smc.merchant_id
+        where sm.status != 2
+        <if test="id != null and id != ''">
+            and sm.id = #{id}
+        </if>
+        <if test="name != null and name != ''">
+            and sm.name like "%"#{name}"%"
+        </if>
+        <if test="invitatCode != null and invitatCode != ''">
+            and sm.invitat_code = #{invitatCode}
+        </if>
+        <if test="phone != null and phone != ''">
+            and sm.phone like "%"#{phone}"%"
+        </if>
+        <if test="title != null and title != ''">
+            and sm.title like "%"#{title}"%"
+        </if>
+        <if test="beginTime != null ">
+            and sm.create_time <![CDATA[ >= ]]> #{beginTime}
+        </if>
+        <if test="endTime != null ">
+            and sm.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="communityId != null and communityId != ''">
+            and smc.community = #{communityId}
+        </if>
+        <if test="countyId != null and countyId != ''">
+            and sm.county_id = #{countyId}
+        </if>
+        <if test="roleId == '4'.toString()">
+            and sm.county_id in (
+            select aci.county_code
+            from agent_county_info aci
+            where aci.agent_id = #{userId}
+            )
+        </if>
+        <if test="memberType != null and memberType != ''">
+            and sm.member_type = #{memberType}
+        </if>
+        <if test="roleId == '6'.toString()">
+            and sm.community_user_id = #{userId}
+        </if>
+    </select>
+    <select id="queryByCommunity" resultMap="BaseResultMap">
+        select sm.*
+        from sys_user_merchant sm
+        left join sys_merchant_community smc
+        on sm.id = smc.merchant_id
+        where sm.status != 2
+        and smc.community = #{community}
+    </select>
+
+    <update id="updateOpenid">
+        update sys_user_merchant
+        set openid = #{openid}
+        where account = #{account}
+    </update>
+
+    <select id="queryOpenid" resultType="java.lang.String">
+        select openid
+        from sys_user_merchant
+        where id = #{id}
+    </select>
+
+    <update id="updateUserLawId">
+        update sys_user_merchant set law_consumer_id = #{lawConsumerId}
+        where id = #{userId}
+    </update>
+
+    <update id="updateBalanceMoney">
+        update sys_user_merchant
+        set balance_money = balance_money + #{money}
+        where id = #{userId}
+        and  balance_money + #{money} >= 0
+    </update>
+
+    <update id="addProfitMoney">
+        update sys_user_merchant
+        set balance_money = balance_money + #{income},
+        total_income = total_income + #{income}
+        where id = #{shoperId}
+        and balance_money + #{income} >= 0
+    </update>
+
+    <select id="getMemberNumByAgentId" resultType="java.lang.Integer">
+      select count(1)
+      from sys_user_merchant su,agent_county_info aci
+      where su.county_id = aci.county_code
+      and aci.agent_id = #{id}
+    </select>
+</mapper>

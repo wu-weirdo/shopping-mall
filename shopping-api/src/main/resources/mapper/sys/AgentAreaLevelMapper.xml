@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.sys.AgentAreaLevelMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.sys.AgentAreaLevel">
+        <id column="id" property="id"/>
+        <result column="province_code" property="provinceCode"/>
+        <result column="province_name" property="provinceName"/>
+        <result column="city_code" property="cityCode"/>
+        <result column="city_name" property="cityName"/>
+        <result column="county_code" property="countyCode"/>
+        <result column="county_name" property="countyName"/>
+        <result column="level" property="level"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, provinceCode, provinceName, cityCode, cityName, county_code, county_name, level, create_time, update_time
+    </sql>
+
+    <select id="hasAgentArea" resultType="java.lang.String">
+        SELECT concat(aal.`level`,aal.province_name,aal.city_name,aal.county_name)
+        FROM cdshopping.agent_area_level aal
+                 INNER JOIN cdshopping.agent_county_info aci ON aal.county_code = aci.county_code
+                 INNER JOIN cdshopping.sys_user_agent sua ON aci.agent_id = sua.id
+        where aci.city_name like "%"#{search}"%" and sua.payment = 20
+        union
+        select concat(aal.`level`,aal.province_name,aal.city_name,aal.county_name)
+        from cdshopping.agent_area_level aal
+                 INNER JOIN cdshopping.agent_county_info aci ON aal.county_code = aci.county_code
+                 INNER JOIN cdshopping.sys_user_agent sua ON aci.agent_id = sua.id
+        where aci.county_name like "%"#{search}"%" and sua.payment = 20
+    </select>
+
+    <select id="protectedAgentArea" resultType="java.lang.String">
+        SELECT concat(aal.`level`, aal.province_name, aal.city_name, aal.county_name)
+        FROM cdshopping.agent_area_level aal
+                 INNER JOIN cdshopping.agent_county_info aci ON aal.county_code = aci.county_code
+                 INNER JOIN cdshopping.sys_user_agent sua ON aci.agent_id = sua.id
+        where aci.city_name like "%"#{search}"%" and sua.payment = 10
+        union
+        select concat(aal.`level`, aal.province_name, aal.city_name, aal.county_name)
+        from cdshopping.agent_area_level aal
+                 INNER JOIN cdshopping.agent_county_info aci ON aal.county_code = aci.county_code
+                 INNER JOIN cdshopping.sys_user_agent sua ON aci.agent_id = sua.id
+        where aci.county_name like "%"#{search}"%" and sua.payment = 10
+    </select>
+
+    <select id="unAgentArea" resultType="java.lang.String">
+        SELECT concat(aal.`level`,aal.province_name,aal.city_name,aal.county_name)
+        FROM agent_area_level aal
+        where (aal.city_name like "%"#{search}"%" or aal.county_name like "%"#{search}"%") and not exists (
+          select 1
+          from agent_county_info aci
+          where  aal.county_code = aci.county_code
+        )
+    </select>
+
+    <select id="queryRecommend" resultType="java.lang.String">
+        select concat(aal.`level`,aal.province_name,aal.city_name,aal.county_name)
+        from agent_area_level aal
+        left join agent_area_level aa on aa.city_code = aal.city_code
+        where aa.county_name like "%"#{search}"%" and not exists (
+          select 1
+          from agent_county_info aci
+          where  aal.county_code = aci.county_code
+        )
+        limit 4
+    </select>
+</mapper>

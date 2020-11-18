@@ -1,0 +1,661 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.order.PayRefundApplyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.trade.PayRefundApply">
+        <id column="id" property="id"/>
+        <result column="order_id" property="orderId"/>
+        <result column="handle_status" property="handleStatus"/>
+        <result column="refund_status" property="refundStatus"/>
+        <result column="apply_refund_time" property="applyRefundTime"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_phone" property="userPhone"/>
+        <result column="total_fee" property="totalFee"/>
+        <result column="refund_method" property="refundMethod"/>
+        <result column="refund_reason" property="refundReason"/>
+        <result column="apply_fee" property="applyFee"/>
+        <result column="refund_fee" property="refundFee"/>
+        <result column="refund_explain" property="refundExplain"/>
+        <result column="handle_refund_time" property="handleRefundTime"/>
+        <result column="handle_user_id" property="handleUserId"/>
+        <result column="remark" property="remark"/>
+        <result column="shoper_id" property="shoperId"/>
+        <result column="shoper_handle_status" property="shoperHandleStatus"/>
+        <result column="apply_refund_status" property="applyRefundStatus"/>
+        <result column="shoper_refuse_reason" property="shoperRefuseReason"/>
+        <result column="collect_user_status" property="collectUserStatus"/>
+        <result column="collect_merchant_status" property="collectMerchantStatus"/>
+
+        <result column="out_order_no" property="outOrderNo"/>
+        <result column="order_type" property="orderType"/>
+    </resultMap>
+
+    <resultMap id="AppRefundApplyVOMap" type="com.edaochina.shopping.domain.vo.order.AppRefundApplyVO">
+        <id column="id" property="id"/>
+        <result column="order_id" property="orderId"/>
+        <result column="refund_status" property="refundStatus"/>
+        <result column="apply_refund_time" property="applyRefundTime"/>
+        <result column="refund_reason" property="refundReason"/>
+        <result column="apply_fee" property="applyFee"/>
+        <result column="refund_explain" property="refundExplain"/>
+        <result column="handle_refund_time" property="handleRefundTime"/>
+        <result column="shoper_refuse_reason" property="shoperRefuseReason"/>
+    </resultMap>
+
+    <resultMap id="AppMerchantRefundOrderVOMap" type="com.edaochina.shopping.domain.vo.order.AppMerchantRefundOrderVO">
+        <id column="id" property="id"/>
+        <result column="order_id" property="orderId"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="buy_num" property="buyNum"/>
+        <result column="create_time" property="createTime"/>
+        <result column="shoper_name" property="shoperName"/>
+        <result column="actual_price" property="actualPrice"/>
+    </resultMap>
+
+    <resultMap id="SysVoMap" type="com.edaochina.shopping.domain.vo.sys.SysOrderRefundVo" extends="BaseResultMap">
+        <result column="orderStatus" property="orderStatus"/>
+        <result column="shoperPhone" property="shoperPhone"/>
+        <result column="handleUserName" property="handleUserName"/>
+    </resultMap>
+
+    <resultMap id="SysExportVoMap" type="com.edaochina.shopping.domain.vo.sys.ExportSysOrderRefundVo"
+               extends="BaseResultMap">
+        <result column="orderStatus" property="orderStatus"/>
+        <result column="handleUserName" property="handleUserName"/>
+        <result column="address" property="address"/>
+        <result column="orderNo" property="orderNo"/>
+        <result column="merchantTitle" property="merchantTitle"/>
+        <result column="goodsName" property="goodsName"/>
+        <result column="goodsTypeName" property="goodsTypeName"/>
+        <result column="nickname" property="nickname"/>
+        <result column="orderCreateTime" property="orderCreateTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, order_id, order_status, handle_status, refund_status, apply_refund_time, user_id, user_phone, total_fee, refund_method, refund_reason, apply_fee, refund_fee, refund_explain, handle_refund_time, handle_user_id, remark, shoper_id, shoper_handle_status, apply_refund_status, shoper_refuse_reason,collect_user_status,collect_merchant_status
+    </sql>
+
+    <select id="list" resultMap="SysVoMap">
+        select refund.*, o.status as orderStatus, shop.phone as shoperPhone, admin.name as handleUserName
+        from cdshopping.pay_refund_apply refund
+        left join cdshopping.order_main o on refund.order_id = o.id
+        left join cdshopping.sys_user_merchant shop on refund.shoper_id = shop.id
+        left join cdshopping.sys_user_admin admin on refund.handle_user_id = admin.id
+        where 1=1
+        <if test="orderId != null and orderId != '' ">
+            and refund.order_id like "%"#{orderId}"%"
+        </if>
+        <if test="id != null and id != '' ">
+            and refund.id = #{id}
+        </if>
+        <if test="shopId != null and shopId != '' ">
+            and shop.id = #{shopId}
+        </if>
+        <if test="userId != null and userId != '' ">
+            and refund.user_id like "%"#{userId}"%"
+        </if>
+        <if test="userPhone != null and userPhone != '' ">
+            and refund.user_phone like "%"#{userPhone}"%"
+        </if>
+        <if test="merchantPhone != null and merchantPhone != '' ">
+            and shop.phone like "%"#{merchantPhone}"%"
+        </if>
+        <if test="userCityAddress != null and userCityAddress != '' ">
+            and shop.county_id like "%"#{userCityAddress}"%"
+        </if>
+        <if test="beginApplyRefundTime != null ">
+            and refund.apply_refund_time <![CDATA[ >= ]]> #{beginApplyRefundTime}
+        </if>
+        <if test="endApplyRefundTime != null ">
+            and refund.apply_refund_time <![CDATA[ <= ]]> #{endApplyRefundTime}
+        </if>
+        <if test="beginHandleRefundTime != null ">
+            and refund.handle_refund_time <![CDATA[ >= ]]> #{beginHandleRefundTime}
+        </if>
+        <if test="endHandleRefundTime != null ">
+            and refund.handle_refund_time <![CDATA[ <= ]]> #{endHandleRefundTime}
+        </if>
+        <choose>
+            <when test="handleStatus != null and handleStatus == 10">
+                and refund.refund_status = 10
+                and ((refund.shoper_handle_status = 10
+                and now() > date_add(refund.apply_refund_time,interval 2 day))
+                or refund.shoper_handle_status = 30)
+            </when>
+
+            <when test="handleStatus != null and handleStatus == 20">
+                and refund.refund_status = 10
+                and refund.shoper_handle_status = 10
+                and now() <![CDATA[ < ]]> date_add(refund.apply_refund_time,interval 2 day)
+                and now() > date_add(refund.apply_refund_time,interval 1 day)
+                and refund.collect_merchant_status = 10
+            </when>
+            <when test="handleStatus != null and handleStatus == 30">
+                and refund.refund_status = 10
+                and refund.shoper_handle_status = 10
+                and now() <![CDATA[ < ]]> date_add(refund.apply_refund_time,interval 2 day)
+                and now() > date_add(refund.apply_refund_time,interval 1 day)
+                and refund.collect_merchant_status = 20
+            </when>
+
+            <when test="handleStatus != null and handleStatus == 50">
+                and refund.refund_status in (30,40)
+            </when>
+            <when test="handleStatus != null and handleStatus == 60">
+                and refund.refund_status = 20
+            </when>
+            <when test="handleStatus != null and handleStatus == 70">
+                and refund.refund_status = 20
+                and refund.collect_user_status = 10
+            </when>
+            <when test="handleStatus != null and handleStatus == 80">
+                and refund.refund_status = 20
+                and refund.collect_user_status = 20
+            </when>
+            <when test="handleStatus != null and handleStatus == 90">
+                and refund.refund_status = 10
+                and refund.apply_refund_time <![CDATA[ < ]]> date_add(now(),interval 1 day)
+            </when>
+        </choose>
+        <if test="refundStatus != null">
+            and refund.refund_status = #{refundStatus}
+        </if>
+        <if test="merchantTitle != null and merchantTitle != '' ">
+            and o.shoper_name like "%"#{merchantTitle}"%"
+        </if>
+        <if test="goodsName != null and goodsName != '' ">
+            and o.goods_name like "%"#{goodsName}"%"
+        </if>
+
+        <if test="handleStatus == null ">
+            order by refund.apply_refund_time desc
+        </if>
+
+        <if test="handleStatus == 20 or handleStatus == 10 ">
+            order by refund.apply_refund_time
+        </if>
+        <if test="handleStatus == 50">
+            order by refund.handle_refund_time desc
+        </if>
+        <if test="handleStatus == 70 or handleStatus == 80">
+            order by refund.handle_refund_time
+        </if>
+        limit ${pages.begIndex},${pages.pageSize}
+    </select>
+
+    <select id="exportList" resultMap="SysExportVoMap">
+        select refund.*, o.status as orderStatus, o.create_time as orderCreateTime, o.order_no as orderNo,
+        shop.title as merchantTitle, o.goods_name as goodsName, g.goods_type_name as goodsTypeName,
+        admin.name as handleUserName, a.name as address, user.nickname
+        from cdshopping.pay_refund_apply refund
+        left join cdshopping.order_main o on o.id = refund.order_id
+        left join cdshopping.goods g on g.id = o.goods_id
+        left join cdshopping.sys_user_merchant shop on shop.id = refund.shoper_id
+        left join cdshopping.sys_user user on user.id = refund.user_id
+        left join cdshopping.sys_address a on a.code = shop.county_id
+        left join cdshopping.sys_user_admin admin on refund.handle_user_id = admin.id
+        where 1=1
+        <if test="orderId != null and orderId != '' ">
+            and refund.order_id like "%"#{orderId}"%"
+        </if>
+        <if test="id != null and id != '' ">
+            and refund.id = #{id}
+        </if>
+        <if test="userId != null and userId != '' ">
+            and refund.user_id like "%"#{userId}"%"
+        </if>
+        <if test="userPhone != null and userPhone != '' ">
+            and refund.user_phone like "%"#{userPhone}"%"
+        </if>
+        <if test="merchantPhone != null and merchantPhone != '' ">
+            and shop.phone like "%"#{merchantPhone}"%"
+        </if>
+        <if test="userCityAddress != null and userCityAddress != '' ">
+            and shop.county_id like "%"#{userCityAddress}"%"
+        </if>
+        <if test="beginApplyRefundTime != null ">
+            and refund.apply_refund_time <![CDATA[ >= ]]> #{beginApplyRefundTime}
+        </if>
+        <if test="endApplyRefundTime != null ">
+            and refund.apply_refund_time <![CDATA[ <= ]]> #{endApplyRefundTime}
+        </if>
+        <if test="beginHandleRefundTime != null ">
+            and refund.handle_refund_time <![CDATA[ >= ]]> #{beginHandleRefundTime}
+        </if>
+        <if test="endHandleRefundTime != null ">
+            and refund.handle_refund_time <![CDATA[ <= ]]> #{endHandleRefundTime}
+        </if>
+        <choose>
+            <when test="handleStatus != null and handleStatus == 10">
+                and refund.refund_status = 10
+                and refund.shoper_handle_status = 10
+                and now() > date_add(refund.apply_refund_time,interval 2 day)
+            </when>
+
+            <when test="handleStatus != null and handleStatus == 20">
+                and refund.refund_status = 10
+                and refund.shoper_handle_status = 10
+                and now() <![CDATA[ < ]]> date_add(refund.apply_refund_time,interval 2 day)
+                and now() > date_add(refund.apply_refund_time,interval 1 day)
+                and refund.collect_merchant_status = 10
+            </when>
+            <when test="handleStatus != null and handleStatus == 30">
+                and refund.refund_status = 10
+                and refund.shoper_handle_status = 10
+                and now() <![CDATA[ < ]]> date_add(refund.apply_refund_time,interval 2 day)
+                and now() > date_add(refund.apply_refund_time,interval 1 day)
+                and refund.collect_merchant_status = 20
+            </when>
+
+            <when test="handleStatus != null and handleStatus == 50">
+                and refund.refund_status in (30,40)
+            </when>
+            <when test="handleStatus != null and handleStatus == 60">
+                and refund.refund_status = 20
+            </when>
+            <when test="handleStatus != null and handleStatus == 70">
+                and refund.refund_status = 20
+                and refund.collect_user_status = 10
+            </when>
+            <when test="handleStatus != null and handleStatus == 80">
+                and refund.refund_status = 20
+                and refund.collect_user_status = 20
+            </when>
+            <when test="handleStatus != null and handleStatus == 90">
+                and refund.refund_status = 10
+                and refund.apply_refund_time <![CDATA[ < ]]> date_add(now(),interval 1 day)
+            </when>
+        </choose>
+        <if test="refundStatus != null">
+            and refund.refund_status = #{refundStatus}
+        </if>
+        <if test="merchantTitle != null and merchantTitle != '' ">
+            and o.shoper_name like "%"#{merchantTitle}"%"
+        </if>
+        <if test="goodsName != null and goodsName != '' ">
+            and o.goods_name like "%"#{goodsName}"%"
+        </if>
+        limit ${pages.begIndex},${pages.pageSize}
+    </select>
+
+    <select id="orderRefundCount" resultType="java.lang.Integer">
+        select COUNT(1)
+        from cdshopping.pay_refund_apply refund
+        left join cdshopping.order_main o on refund.order_id = o.id
+        left join cdshopping.sys_user_merchant shop on refund.shoper_id = shop.id
+        where 1=1
+        <if test="id != null and id != '' ">
+            and refund.id = #{id}
+        </if>
+        <if test="orderId != null and orderId != '' ">
+            and refund.order_id like "%"#{orderId}"%"
+        </if>
+        <if test="userId != null and userId != '' ">
+            and refund.user_id like "%"#{userId}"%"
+        </if>
+        <if test="userPhone != null and userPhone != '' ">
+            and refund.user_phone like "%"#{userPhone}"%"
+        </if>
+        <if test="merchantPhone != null and merchantPhone != '' ">
+            and shop.phone like "%"#{merchantPhone}"%"
+        </if>
+        <if test="shopId != null and shopId != '' ">
+            and shop.id = #{shopId}
+        </if>
+        <if test="userCityAddress != null and userCityAddress != '' ">
+            and shop.county_id like "%"#{userCityAddress}"%"
+        </if>
+        <if test="beginApplyRefundTime != null ">
+            and refund.apply_refund_time <![CDATA[ >= ]]> #{beginApplyRefundTime}
+        </if>
+        <if test="endApplyRefundTime != null ">
+            and refund.apply_refund_time <![CDATA[ <= ]]> #{endApplyRefundTime}
+        </if>
+        <if test="beginHandleRefundTime != null ">
+            and refund.handle_refund_time <![CDATA[ >= ]]> #{beginHandleRefundTime}
+        </if>
+        <if test="endHandleRefundTime != null ">
+            and refund.handle_refund_time <![CDATA[ <= ]]> #{endHandleRefundTime}
+        </if>
+        <choose>
+            <when test="handleStatus != null and handleStatus == 10">
+                and refund.refund_status = 10
+                and refund.shoper_handle_status = 10
+                and now() > date_add(refund.apply_refund_time,interval 2 day)
+            </when>
+
+            <when test="handleStatus != null and handleStatus == 20">
+                and refund.refund_status = 10
+                and refund.shoper_handle_status = 10
+                and now() <![CDATA[ < ]]> date_add(refund.apply_refund_time,interval 2 day)
+                and now() > date_add(refund.apply_refund_time,interval 1 day)
+                and refund.collect_merchant_status = 10
+            </when>
+            <when test="handleStatus != null and handleStatus == 30">
+                and refund.refund_status = 10
+                and refund.shoper_handle_status = 10
+                and now() <![CDATA[ < ]]> date_add(refund.apply_refund_time,interval 2 day)
+                and now() > date_add(refund.apply_refund_time,interval 1 day)
+                and refund.collect_merchant_status = 20
+            </when>
+
+            <when test="handleStatus != null and handleStatus == 50">
+                and refund.refund_status in (30,40)
+            </when>
+            <when test="handleStatus != null and handleStatus == 60">
+                and refund.refund_status = 20
+            </when>
+            <when test="handleStatus != null and handleStatus == 70">
+                and refund.refund_status = 20
+                and refund.collect_user_status = 10
+            </when>
+            <when test="handleStatus != null and handleStatus == 80">
+                and refund.refund_status = 20
+                and refund.collect_user_status = 20
+            </when>
+            <when test="handleStatus != null and handleStatus == 90">
+                and refund.refund_status = 10
+                and refund.apply_refund_time <![CDATA[ < ]]> date_add(now(),interval 1 day)
+            </when>
+        </choose>
+        <if test="refundStatus != null and refundStatus != '' ">
+            and refund.refund_status = #{refundStatus}
+        </if>
+        <if test="merchantTitle != null and merchantTitle != '' ">
+            and o.shoper_name like "%"#{merchantTitle}"%"
+        </if>
+        <if test="goodsName != null and goodsName != '' ">
+            and o.goods_name like "%"#{goodsName}"%"
+        </if>
+    </select>
+
+
+    <insert id="insertRefundApply">
+        insert into pay_refund_apply(
+        <if test="orderId != null">
+            order_id
+        </if>
+        <if test="applyRefundTime != null">
+            , apply_refund_time
+        </if>
+        <if test="userId != null">
+            , user_id
+        </if>
+        <if test="userPhone != null">
+            , user_phone
+        </if>
+        <if test="totalFee != null">
+            , total_fee
+        </if>
+        <if test="refundMethod != null">
+            , refund_method
+        </if>
+        <if test="refundReason != null">
+            ,refund_reason
+        </if>
+        <if test="applyFee != null">
+            , apply_fee
+        </if>
+        <if test="refundExplain != null">
+            , refund_explain
+        </if>
+        <if test="shoperId != null">
+            , shoper_id
+        </if>
+        <if test="refundFee != null">
+            ,refund_fee
+        </if>
+        <if test="handleStatus != null ">
+            ,handle_status
+        </if>
+        <if test="refundStatus != null">
+            ,refund_status
+        </if>
+
+        <if test="outOrderNo != null">
+            ,out_order_no
+        </if>
+        <if test="orderType != null">
+            ,order_type
+        </if>
+        )
+        values(
+        <if test="orderId != null">
+            #{orderId}
+        </if>
+        <if test="applyRefundTime != null">
+            , #{applyRefundTime}
+        </if>
+        <if test="userId != null">
+            , #{userId}
+        </if>
+        <if test="userPhone != null">
+            , #{userPhone}
+        </if>
+        <if test="totalFee != null">
+            , #{totalFee}
+        </if>
+        <if test="refundMethod != null">
+            , #{refundMethod}
+        </if>
+        <if test="refundReason != null">
+            , #{refundReason}
+        </if>
+        <if test="applyFee != null">
+            , #{applyFee}
+        </if>
+        <if test="refundExplain != null">
+            , #{refundExplain}
+        </if>
+        <if test="shoperId != null">
+            , #{shoperId}
+        </if>
+        <if test="refundFee != null">
+            ,#{refundFee}
+        </if>
+        <if test="handleStatus != null">
+            ,#{handleStatus}
+        </if>
+        <if test="refundStatus != null">
+            ,#{refundStatus}
+        </if>
+
+        <if test="outOrderNo != null">
+            ,#{outOrderNo}
+        </if>
+        <if test="orderType != null">
+            ,#{orderType}
+        </if>
+        )
+        <selectKey keyProperty="id" order="AFTER" resultType="int">
+            select last_insert_id()
+        </selectKey>
+    </insert>
+    <select id="refundApplyInfo" resultMap="AppRefundApplyVOMap">
+        select *
+        from pay_refund_apply
+        where id = #{id}
+        and apply_refund_status = 10
+    </select>
+    <select id="merchantRefundOrders" resultMap="AppMerchantRefundOrderVOMap">
+        SELECT pra.id, om.id AS order_id, om.`goods_num` AS
+        buy_num,g.`goods_name`,om.`create_time`,om.actual_price,om.`shoper_name`
+        FROM pay_refund_apply pra
+        LEFT JOIN order_main om ON pra.`order_id` = om.`id`
+        LEFT JOIN goods g ON om.`goods_id` = g.`id`
+        WHERE pra.`shoper_id` = #{shoperId}
+        AND pra.apply_refund_status = 10
+        <if test="paramStatus == '0'.toString() ">
+            AND pra.shoper_handle_status = 10
+            AND pra.refund_status = 10
+        </if>
+        <if test="paramStatus == '1'.toString()">
+            AND pra.refund_status IN (30,40)
+        </if>
+        <if test="paramStatus == '2'.toString()">
+            AND pra.refund_status = 20
+        </if>
+        <if test="search != null and search !=''">
+            and (om.user_id LIKE "%"#{search}"%"
+            OR om.id LIKE "%"#{search}"%"
+            OR om.`phone` LIKE "%"#{search}"%"
+            OR g.goods_name LIKE "%"#{search}"%"
+            )
+        </if>
+        <if test="paramStatus == '0'.toString() ">
+            order by pra.apply_refund_time desc
+        </if>
+        <if test="paramStatus == '1'.toString()">
+            order by pra.handle_refund_time desc
+        </if>
+        <if test="paramStatus == '2'.toString()">
+            order by pra.handle_refund_time desc
+        </if>
+    </select>
+    <select id="merchantRefundOrderCount" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM pay_refund_apply pra
+        LEFT JOIN order_main om ON pra.`order_id` = om.`id`
+        LEFT JOIN goods g ON om.`goods_id` = g.`id`
+        WHERE pra.`shoper_id` = #{shoperId}
+        AND pra.apply_refund_status = 10
+        <if test="paramStatus == '0'.toString() ">
+            AND pra.shoper_handle_status = 10
+            AND pra.refund_status = 10
+        </if>
+        <if test="paramStatus == '1'.toString()">
+            AND pra.refund_status IN (30,40)
+        </if>
+        <if test="paramStatus == '2'.toString()">
+            AND pra.refund_status = 20
+        </if>
+        <if test="search != null and search !=''">
+            and (om.user_id LIKE "%"#{search}"%"
+            OR om.id LIKE "%"#{search}"%"
+            OR om.`phone` LIKE "%"#{search}"%"
+            OR g.goods_name LIKE "%"#{search}"%"
+            )
+        </if>
+    </select>
+    <select id="selectById" resultMap="BaseResultMap">
+        select *
+        from pay_refund_apply
+        where id = #{id}
+    </select>
+    <update id="updateApplyStatus">
+        update pay_refund_apply
+        set apply_refund_status = #{applyStatus}
+        <if test="applyStatus == 20">
+            , refund_status = 50
+        </if>
+        where id = #{id}
+    </update>
+    <update id="refuseRefund">
+        update pay_refund_apply
+        set shoper_handle_status = 20, shoper_refuse_reason = #{refuseReason}
+        where id = #{id}
+    </update>
+    <update id="agreeRefund">
+        update pay_refund_apply
+        set shoper_handle_status = 30
+        where id = #{id}
+    </update>
+
+    <update id="sysUpdate">
+        update cdshopping.pay_refund_apply
+        set handle_status = #{handleStatus}
+        <if test="refundStatus != null and refundStatus != 0 ">
+            , refund_status = #{refundStatus}
+        </if>
+        <if test="remark != null and remark != '' ">
+            , remark = #{remark}
+        </if>
+        <if test="refundFee != null and refundFee != 0 ">
+            , refund_fee = #{refundFee}
+        </if>
+        <if test="handleUserId != null and handleUserId != '' ">
+            , handle_user_id = #{handleUserId}
+        </if>
+        <if test="handleRefundTime != null ">
+            , handle_refund_time = #{handleRefundTime}
+        </if>
+        where id = #{id}
+    </update>
+
+
+    <select id="queryWaitRemit" resultMap="BaseResultMap">
+      select *
+      from pay_refund_apply
+      where remit_status in (10,30)
+      and refund_status = 30
+      limit 100
+    </select>
+
+
+    <update id="updateFefundStatus">
+        update pay_refund_apply
+        set refund_status = #{status}
+        where id = #{id}
+    </update>
+
+    <update id="updateHanlderStatus">
+        update pay_refund_apply
+        set handle_status = #{status}
+        where id = #{id}
+    </update>
+
+
+    <select id="queryByMerchantAndHandlerStatus" resultMap="BaseResultMap">
+      select *
+      from pay_refund_apply
+      where shoper_handle_status = #{merchantHandlerStatus}
+      and refund_status = #{refundStatus}
+      limit #{pageSize}
+    </select>
+
+    <update id="updateMerchantUnHandlerToUnConnect">
+        update pay_refund_apply
+        set handle_status = 40
+        where refund_status = 10
+        and shoper_handle_status = 10
+        and handle_status = 10
+        and apply_refund_time <![CDATA[ < ]]> #{time}
+    </update>
+
+    <select id="selectByOrderIdAndInRefundStatus" resultMap="BaseResultMap">
+        select *
+        from pay_refund_apply
+        where order_id = #{orderId}
+        and refund_status in
+        <foreach collection="status" separator="," item="refundStatus" open="(" close=")">
+            #{refundStatus}
+        </foreach>
+    </select>
+
+    <select id="queryRefundApplyInfoByOrderId" resultMap="AppRefundApplyVOMap">
+        select *
+        from pay_refund_apply
+        where order_id = #{orderId}
+        and refund_status in (10,20,30,40)
+    </select>
+
+    <update id="updateRemitStatus">
+        update pay_refund_apply
+        set remit_status = #{remitStatus}
+        where id = #{refundApplyId}
+    </update>
+
+    <update id="updateCollectUserStatus">
+      update pay_refund_apply
+      set collect_user_status = 20
+      where id = #{id}
+    </update>
+
+    <update id="updateCollectMerchantStatus">
+      update pay_refund_apply
+      set collect_merchant_status = 20
+      where id = #{id}
+    </update>
+</mapper>

@@ -1,0 +1,861 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.order.OrderMainMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.order.OrderMain">
+        <id column="id" property="id"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="shoper_id" property="shoperId"/>
+        <result column="shoper_name" property="shoperName"/>
+        <result column="shoper_address" property="shoperAddress"/>
+        <result column="shoper_area" property="shoperArea"/>
+        <result column="goods_id" property="goodsId"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
+        <result column="user_address" property="userAddress"/>
+        <result column="phone" property="phone"/>
+        <result column="goods_num" property="goodsNum"/>
+        <result column="actual_price" property="actualPrice"/>
+        <result column="cost_price" property="costPrice"/>
+        <result column="total_price" property="totalPrice"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
+        <result column="delete_flag" property="deleteFlag"/>
+        <result column="create_time" property="createTime"/>
+        <result column="write_off_time" property="writeOffTime"/>
+        <result column="refund_time" property="refundTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="write_off_status" property="writeOffStatus"/>
+        <result column="has_refund" property="hasRefund"/>
+
+        <result column="collect_flag" property="collectFlag"/>
+        <result column="collect_info_id" property="collectInfoId"/>
+        <result column="share_merchant_id" property="shareMerchantId"/>
+        <result column="share_rate" property="shareRate"/>
+    </resultMap>
+
+    <resultMap id="AppTakeGoodsVoMap" type="com.edaochina.shopping.domain.vo.order.AppTakeGoodsVO">
+        <result column="id" property="id"/>
+        <result column="goods_spec" property="goodsSpec"/>
+        <result column="goods_num" property="goodsNum"/>
+        <result column="img_url" property="imgUrl"/>
+        <result column="shoper_name" property="shoperName"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="actual_price" property="actualPrice"/>
+        <result column="cost_price" property="costPrice"/>
+        <result column="total_price" property="totalPrice"/>
+        <result column="status" property="status"/>
+        <result column="write_off_status" property="writeOffStatus"/>
+        <result column="goods_id" property="goodsId"/>
+        <result column="shoper_id" property="shoperId"/>
+        <result column="collect_flag" property="collectFlag"/>
+    </resultMap>
+
+    <resultMap id="merchantOrderVoMap" type="com.edaochina.shopping.domain.vo.order.AppMerchantOrderVo">
+        <result column="id" property="id"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="status" property="status"/>
+        <result column="buy_num" property="buyNum"/>
+        <result column="goods_spec" property="goodsSpec"/>
+        <result column="create_time" property="createTime"/>
+        <result column="write_Off_time" property="writeOffTime"/>
+        <result column="cost_price" property="costPrice"/>
+        <result column="today_write_flag" property="todayWriteFlag"/>
+        <result column="shop_name" property="shopName"/>
+        <result column="actual_price" property="actualPrice"/>
+        <result column="collect_flag" property="collectFlag"/>
+    </resultMap>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="SysOrderVoMap" type="com.edaochina.shopping.domain.vo.order.SysOrderVO">
+        <id column="id" property="id"/>
+        <id column="order_no" property="orderNo"/>
+        <result column="shoper_id" property="shoperId"/>
+        <result column="shoper_name" property="shoperName"/>
+        <result column="goods_id" property="goodsId"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="user_id" property="userId"/>
+        <result column="phone" property="phone"/>
+        <result column="goods_num" property="goodsNum"/>
+        <result column="total_price" property="totalPrice"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="user_nick_name" property="userNickName"/>
+        <result column="goods_type_name" property="goodsTypeName"/>
+    </resultMap>
+
+
+    <resultMap id="CollectOrderMap" type="com.edaochina.shopping.domain.vo.order.AppCollectOrderVO">
+        <result column="order_id" property="orderId"/>
+        <result column="shoper_id" property="shoperId"/>
+        <result column="shoper_name" property="shoperName"/>
+        <result column="collect_status" property="collectStatus"/>
+        <result column="num" property="num"/>
+        <result column="collect_num" property="collectNum"/>
+        <result column="buy_num" property="buyedNum"/>
+        <result column="price" property="price"/>
+        <result column="first_show_img" property="img"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="goodsId" property="goodsId"/>
+    </resultMap>
+
+    <resultMap id="CollectOrderDetailMap" type="com.edaochina.shopping.domain.vo.order.AppCollectOrderDetailVO">
+        <result column="shoper_id" property="shoperId"/>
+        <result column="shoper_name" property="shoperName"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="price" property="price"/>
+        <result column="goods_retail_price" property="goodsRetailPrice"/>
+        <result column="collect_num" property="collectNum"/>
+        <result column="buy_num" property="buyedNum"/>
+        <result column="num" property="num"/>
+        <result column="img" property="img"/>
+        <result column="order_id" property="orderId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_phone" property="userPhone"/>
+        <result column="collect_status" property="collectStatus"/>
+        <result column="name" property="userName"/>
+        <result column="collect_last_valid_time" property="collectLastValidTime"/>
+        <result column="user_avatar" property="userAvatar"/>
+        <result column="order_status" property="orderStatus"/>
+        <result column="goods_id" property="goodsId"/>
+        <result column="has_refund_flag" property="hasRefundFlag"/>
+    </resultMap>
+
+
+    <resultMap id="SysShareProfitVoMap" type="com.edaochina.shopping.domain.vo.trade.SysShareProfitVo">
+        <result column="id" property="id"/>
+        <result column="order_id" property="orderId"/>
+        <result column="merchant_id" property="merchantId"/>
+        <result column="share_merchant_id" property="shareMerchantId"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="buy_num" property="buyNum"/>
+        <result column="goods_type" property="goodsType"/>
+        <result column="order_price" property="orderPrice"/>
+        <result column="profit_free" property="profitFree"/>
+        <result column="profit_time" property="profitTime"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, order_no, shoper_id, shoper_name, shoper_address, shoper_area, goods_id, goods_name, rider_id, rider_name, rider_phone, user_id, user_name, user_address, use_code, phone, goods_num, delivery_price, actual_price, cost_price, total_price, team_member_num, limit_buy_flag, limit_buy_num, use_count_down, use_count_down_time, order_type, status, deliver_status, remark, return_pay_info, prepay_id, delete_flag, create_time, collect_time, expected_deliver_time, deliver_time, write_off_time, refund_time, update_time,
+        share_merchant_id,share_rate
+    </sql>
+
+    <select id="getExportOrderList" resultType="com.edaochina.shopping.domain.vo.order.ExportSysOrderVO">
+        select
+        om.id,om.order_no,om.shoper_name,om.goods_name,g.goods_type_name,om.user_id,om.user_name,om.phone,t.address,om.goods_num,om.actual_price
+        total_price,su.nickname,om.write_off_time,
+        case when om.status = 10 then '待分享' when om.status = 20 then '待使用' when om.status = 30 then '待评价'
+        when om.status = 40 then '已退款' when om.status = 50 then '已评价' when om.status = 60 then '已过期' when om.status = 70
+        then '待支付' when om.status = 80 then '付款失败' when om.status = 90 then '已支付待回调' end as status,om.create_time
+        from order_main om
+        left join sys_user_merchant mc on mc.id = om.shoper_id
+        left join goods g on om.goods_id = g.id
+        left join sys_user su on su.id = om.user_id
+        left join (
+        SELECT CONCAT(sa.`name`,sa1.`name`,sa2.`name`) address,sa2.`code` county_id
+        FROM sys_address sa
+        INNER JOIN sys_address sa1 ON sa.`code` = sa1.`parent_code`
+        INNER JOIN sys_address sa2 ON sa1.`code` = sa2.`parent_code`
+        WHERE sa2.`level` = 3
+        ) t on t.county_id = mc.county_id
+        where om.delete_flag = 10
+        <if test="shopId != null and shopId != ''">
+            and om.shoper_id = #{shopId}
+        </if>
+        <if test="id != null and id != ''">
+            and om.id like "%"#{id}"%"
+        </if>
+        <if test="goodsTypeId != null and goodsTypeId != ''">
+            and g.goods_type_id = #{goodsTypeId}
+        </if>
+        <if test="shoperName != null and shoperName != ''">
+            and om.shoper_name like "%"#{shoperName}"%"
+        </if>
+        <if test="goodsName != null and goodsName != ''">
+            and om.goods_name like "%"#{goodsName}"%"
+        </if>
+        <if test="userId != null and userId != ''">
+            and om.user_id like "%"#{userId}"%"
+        </if>
+        <if test="phone != null and phone != ''">
+            and om.phone like "%"#{phone}"%"
+        </if>
+        <if test="userNickName != null and userNickName != ''">
+            and su.nickname like "%"#{userNickName}"%"
+        </if>
+        <if test="collectStartTime != null">
+            and om.create_time <![CDATA[ >= ]]> #{collectStartTime}
+        </if>
+        <if test="collectEndTime != null">
+            and om.create_time <![CDATA[ <= ]]> #{collectEndTime}
+        </if>
+        <if test="status != null">
+            and om.status = #{status}
+        </if>
+        <if test="collectFlag != null">
+            and om.collect_flag = #{collectFlag}
+        </if>
+        <if test="merchantId != null and merchantId!= ''">
+            and om.shoper_id = #{merchantId}
+        </if>
+        <choose>
+            <when test="orderStatus == 10">
+                and om.status in (10,30,50)
+            </when>
+            <when test="orderStatus == 20">
+                and om.status in (20,90)
+            </when>
+            <when test="orderStatus == 40">
+                and om.status = 40
+            </when>
+            <when test="orderStatus == 60">
+                and om.status = 60
+            </when>
+            <when test="orderStatus == 70">
+                and om.status = 70
+            </when>
+            <when test="orderStatus == 21">
+                and om.status in (21,91)
+            </when>
+        </choose>
+        <if test="agentId != null and agentId != ''">
+            and exists (
+            select 1
+            from agent_county_info aci
+            where aci.agent_id = #{agentId}
+            and aci.county_code = mc.county_id
+            )
+        </if>
+        <if test="countyId != null and countyId!= ''">
+            and mc.county_id = #{countyId}
+        </if>
+        <if test="orderNo != null and orderNo!= ''">
+            and om.order_no = #{orderNo}
+        </if>
+        order by om.create_time desc
+    </select>
+
+    <select id="getExportOrderCount"
+            resultType="java.lang.Integer">
+        select count(1)
+        from order_main om
+        left join sys_user_merchant mc on mc.id = om.shoper_id
+        left join goods g on om.goods_id = g.id
+        left join sys_user su on su.id = om.user_id
+        left join (
+        SELECT CONCAT(sa.`name`,sa1.`name`,sa2.`name`) address,sa2.`code` county_id
+        FROM sys_address sa
+        INNER JOIN sys_address sa1 ON sa.`code` = sa1.`parent_code`
+        INNER JOIN sys_address sa2 ON sa1.`code` = sa2.`parent_code`
+        WHERE sa2.`level` = 3
+        ) t on t.county_id = mc.county_id
+        where om.delete_flag = 10
+        <if test="shopId != null and shopId != ''">
+            and om.shoper_id = #{shopId}
+        </if>
+        <if test="id != null and id != ''">
+            and om.id like "%"#{id}"%"
+        </if>
+        <if test="shoperName != null and shoperName != ''">
+            and om.shoper_name like "%"#{shoperName}"%"
+        </if>
+        <if test="goodsName != null and goodsName != ''">
+            and om.goods_name like "%"#{goodsName}"%"
+        </if>
+        <if test="userId != null and userId != ''">
+            and om.user_id like "%"#{userId}"%"
+        </if>
+        <if test="phone != null and phone != ''">
+            and om.phone like "%"#{phone}"%"
+        </if>
+        <if test="userNickName != null and userNickName != ''">
+            and su.nickname like "%"#{userNickName}"%"
+        </if>
+        <if test="collectStartTime != null">
+            and om.create_time <![CDATA[ >= ]]> #{collectStartTime}
+        </if>
+        <if test="collectEndTime != null">
+            and om.create_time <![CDATA[ <= ]]> #{collectEndTime}
+        </if>
+        <if test="status != null">
+            and om.status = #{status}
+        </if>
+        <if test="collectFlag != null">
+            and om.collect_flag = #{collectFlag}
+        </if>
+        <choose>
+            <when test="orderStatus == 10">
+                and om.status in (10,30,50)
+            </when>
+            <when test="orderStatus == 20">
+                and om.status in (20,90)
+            </when>
+            <when test="orderStatus == 40">
+                and om.status = 40
+            </when>
+            <when test="orderStatus == 60">
+                and om.status = 60
+            </when>
+            <when test="orderStatus == 70">
+                and om.status = 70
+            </when>
+            <when test="orderStatus == 21">
+                and om.status in (21,91)
+            </when>
+        </choose>
+        <if test="agentId != null and agentId != ''">
+            and exists (
+            select 1
+            from agent_county_info aci
+            where aci.agent_id = #{agentId}
+            and aci.county_code = mc.county_id
+            )
+        </if>
+        <if test="countyId != null and countyId!= ''">
+            and mc.county_id = #{countyId}
+        </if>
+        <if test="orderNo != null and orderNo!= ''">
+            and om.order_no = #{orderNo}
+        </if>
+    </select>
+
+
+    <select id="queryHasBuyNum" resultType="java.lang.Integer">
+        select sum(goods_num)
+        from order_main
+        where user_id = #{userId}
+        and goods_id = #{goodsId}
+        and status in (10,20,30,50,90,21,91)
+        <if test="startOfDay != null">
+            and create_time > #{startOfDay}
+        </if>
+
+    </select>
+
+    <update id="updateOrderStatus">
+        update order_main
+        set status = #{status}, write_off_status = #{writeOffStatus}
+        where order_id = #{orderId}
+    </update>
+
+    <select id="queryUserOrderCount" resultType="com.edaochina.shopping.domain.vo.order.AppUserOrderCountVO">
+        select sum(case when status in (20,90) then 1 else 0 end ) unusedOrderNum,
+        sum(case when status in (30,50) then 1 else 0 end ) usedOrderNum,
+        count(1) as orderNum
+        from order_main
+        where delete_flag = 10
+        <if test="userId != null and userId != ''">
+            and user_id = #{userId}
+        </if>
+        <if test="shoperId != null and shoperId != ''">
+            and shoper_id = #{shoperId}
+        </if>
+        and status != 70
+    </select>
+
+    <select id="queryUserOrderList" resultMap="AppTakeGoodsVoMap">
+        select om.id,om.shoper_name, g.first_show_img as img_url, om.goods_name, g.goods_spec, om.goods_num,
+        om.total_price,
+        om.cost_price,om.actual_price,om.write_off_status,
+        om.status,om.goods_id ,om.shoper_id,om.collect_flag
+        from order_main om
+        left join goods g on om.goods_id = g.id
+        where om.delete_flag = 10
+        <if test="userId != null and userId != ''">
+            and om.user_id = #{userId}
+        </if>
+        <if test="shoperId != null and shoperId != ''">
+            and om.shoper_id = #{shoperId}
+        </if>
+        and om.status != 70
+        and om.status != 21
+        and om.status != 91
+        order by FIELD(om.status,20,90,30,50,60,40) , om.create_time desc
+    </select>
+
+    <select id="getMerchantOrders" resultMap="merchantOrderVoMap">
+        SELECT om.id ,om.`goods_num` AS
+        buy_num,g.`goods_name`,om.`status`,g.`goods_spec`,om.`create_time`,om.actual_price,om.`write_off_time`,
+        om.`cost_price`,om.`shoper_name` as shop_name,CASE WHEN om.`write_off_time` > DATE_FORMAT(NOW(), '%Y%m%d') THEN
+        1 ELSE 0 END AS today_write_flag,om.collect_flag
+        FROM cdshopping.order_main om
+        LEFT JOIN cdshopping.goods g ON om.`goods_id` = g.`id`
+        WHERE om.`shoper_id` = #{shopId}
+        <choose>
+            <when test="paramStatus == '0'.toString() ">
+                and om.status in (20,90)
+            </when>
+            <when test="paramStatus == '1'.toString()">
+                and om.status in (30,50)
+            </when>
+            <otherwise>
+                and om.status in (20,90,30,50)
+            </otherwise>
+        </choose>
+        <if test="search != null and search !=''">
+            AND (
+            om.user_id LIKE "%"#{search}"%"
+            OR om.id LIKE "%"#{search}"%"
+            OR om.`phone` LIKE "%"#{search}"%"
+            OR g.goods_name LIKE "%"#{search}"%"
+            )
+        </if>
+        <choose>
+            <when test="paramStatus == '0'.toString() ">
+                order by om.create_time desc
+            </when>
+            <when test="paramStatus == '1'.toString()">
+                order by om.write_off_time desc
+            </when>
+            <otherwise>
+                order by om.create_time desc
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="queryUserOrders" resultMap="AppTakeGoodsVoMap">
+        select
+        om.id, om.shoper_name,g.first_show_img as img_url, om.goods_name, g.goods_spec, om.goods_num, om.total_price,
+        om.cost_price,om.actual_price,om.write_off_status, om.status,om.goods_id ,om.shoper_id,om.collect_flag
+        from order_main om
+        left join goods g on om.goods_id = g.id
+        where om.user_id = #{userId}
+        <if test="status == '20'.toString()">
+            and om.status in (20,90)
+        </if>
+        <if test="status == '30'.toString()">
+            and om.status in (30,50)
+        </if>
+        <if test="status == '60'.toString()">
+            and om.status = 60
+        </if>
+        <if test="status == '40'.toString()">
+            and om.status = 40
+        </if>
+        and om.delete_flag = 10
+        and om.status != 70
+        and om.status != 91
+        and om.status != 21
+        <if test="status == '30'.toString()">
+            order by om.write_off_time desc
+        </if>
+        <if test="status == '40'.toString()">
+            order by om.refund_time desc
+        </if>
+        <if test="status != '30'.toString() and status != '40'.toString()">
+            order by om.create_time desc
+        </if>
+    </select>
+
+    <select id="getTodayWriteOffCount" resultType="java.lang.Integer">
+        select count(1)
+        from order_main
+        where shoper_id = #{merchantId}
+        and write_off_status = 1
+        and write_off_time >  DATE_FORMAT(NOW(), '%Y%m%d')
+    </select>
+
+    <update id="updateOrderStatusByOrderNo">
+        update order_main
+        set status = #{status}
+        <if test="status == 80">
+            ,delete_flag = 20
+        </if>
+        where order_no = #{orderNo}
+    </update>
+
+    <select id="sysQueryOrders" resultMap="SysOrderVoMap">
+        select om.id,om.shoper_id,om.shoper_name,om.goods_id
+        ,om.goods_name,om.user_id,om.phone,om.goods_num,om.actual_price total_price
+        ,om.status,om.create_time,su.nickname as user_nick_name
+        ,om.order_no, g.goods_type_name
+        from order_main om
+        left join sys_user su on su.id = om.user_id
+        left join goods g on g.id = om.goods_id
+        <if test="(agentId != null and agentId != '') or (countyId != null and countyId != '')">
+            left join sys_user_merchant mc on om.shoper_id = mc.id
+        </if>
+        where om.delete_flag = 10
+        <if test="shopId != null and shopId != ''">
+            and om.shoper_id = #{shopId}
+        </if>
+        <if test="goodsTypeId != null and goodsTypeId != ''">
+            and g.goods_type_id = #{goodsTypeId}
+        </if>
+        <if test="id != null and id != ''">
+            and om.id like "%"#{id}"%"
+        </if>
+        <if test="shoperName != null and shoperName != ''">
+            and om.shoper_name like "%"#{shoperName}"%"
+        </if>
+        <if test="goodsName != null and goodsName != ''">
+            and om.goods_name like "%"#{goodsName}"%"
+        </if>
+        <if test="userId != null and userId != ''">
+            and om.user_id like "%"#{userId}"%"
+        </if>
+        <if test="phone != null and phone != ''">
+            and om.phone like "%"#{phone}"%"
+        </if>
+        <if test="userNickName != null and userNickName != ''">
+            and su.nickname like "%"#{userNickName}"%"
+        </if>
+        <if test="collectStartTime != null">
+            and om.create_time <![CDATA[ >= ]]> #{collectStartTime}
+        </if>
+        <if test="collectEndTime != null">
+            and om.create_time <![CDATA[ <= ]]> #{collectEndTime}
+        </if>
+        <if test="status != null">
+            and om.status = #{status}
+        </if>
+        <if test="collectFlag != null">
+            and om.collect_flag = #{collectFlag}
+        </if>
+        <choose>
+            <when test="orderStatus == 10">
+                and om.status in (10,30,50)
+            </when>
+            <when test="orderStatus == 20">
+                and om.status in (20,90)
+            </when>
+            <when test="orderStatus == 40">
+                and om.status = 40
+            </when>
+            <when test="orderStatus == 60">
+                and om.status = 60
+            </when>
+            <when test="orderStatus == 70">
+                and om.status = 70
+            </when>
+            <when test="orderStatus == 21">
+                and om.status in (21,91)
+            </when>
+        </choose>
+        <if test="agentId != null and agentId != ''">
+            and exists (
+            select 1
+            from agent_county_info aci
+            where aci.agent_id = #{agentId}
+            and aci.county_code = mc.county_id
+            )
+        </if>
+        <if test="countyId != null and countyId!= ''">
+            and mc.county_id = #{countyId}
+        </if>
+        <if test="orderNo != null and orderNo!= ''">
+            and om.order_no = #{orderNo}
+        </if>
+        <if test="merchantId != null and merchantId!= ''">
+            and om.shoper_id = #{merchantId}
+        </if>
+        order by om.create_time desc
+    </select>
+    <select id="waitTakeGoodsCount" resultType="java.lang.Integer">
+        select count(1)
+        from order_main
+        where user_id = #{userId}
+        and status in (20,90)
+    </select>
+
+    <select id="queryHasNotCalcOrder" resultMap="BaseResultMap">
+      select *
+      from order_main
+      where calc_status = 0
+      and write_off_status = 1
+      limit 100
+    </select>
+
+    <select id="queryUnUsedOrder" resultMap="BaseResultMap">
+      select *
+      from order_main
+      where delete_flag = 10
+      and status in (20,90)
+      limit 100
+    </select>
+
+    <select id="getCollectOrderSumByGoodsId" resultType="java.lang.Integer">
+        select sum(goods_num)
+        from order_main o
+        inner join goods_collect_info gci
+        where o.status in (20,30,90,21,91)
+        and o.goods_id = #{goodsId}
+        and gci.goods_id = #{goodsId}
+        and gci.delete_flag = 0
+        and gci.id = o.collect_info_id
+    </select>
+
+    <select id="getCollectOrderNumByGoodsId" resultType="java.lang.Integer">
+        select count(1)
+        from order_main o
+        inner join goods_collect_info gci
+        where o.status in (20,30,90,21,91)
+        and o.goods_id = #{goodsId}
+        and gci.goods_id = #{goodsId}
+        and gci.delete_flag = 0
+        and gci.id = o.collect_info_id
+    </select>
+
+    <select id="queryCollectOrderList" resultType="com.edaochina.shopping.domain.vo.order.AppCollectOrderSimpleInfo">
+        select
+          s.nickname as userNickname,
+          s.avatar as userAvatar,
+          o.create_time as orderTime,
+          o.goods_name as goodsName,
+          o.goods_num as orderNum
+        from goods_collect_info gci
+        inner join order_main o
+        left join sys_user s on o.user_id = s.id
+        where o.status in (20,30,90,21,91)
+        and o.goods_id = #{goodsId}
+        and gci.goods_id = #{goodsId}
+        and gci.delete_flag = 0
+        and gci.id = o.collect_info_id
+        order by o.create_time desc
+        limit 30
+    </select>
+    <select id="refundOrderCount" resultType="java.lang.Integer">
+        select count(1)
+        from order_main
+        where user_id = #{userId}
+        and status = 40
+    </select>
+
+    <update id="updateOrderRefundStatus">
+        update order_main
+        set has_refund = #{refundStatus}
+        where id = #{orderId}
+    </update>
+
+    <select id="getUserCollectUserImg" resultType="java.lang.String">
+        select
+          s.avatar
+        from goods_collect_info gci
+        inner join order_main o
+        left join sys_user s on o.user_id = s.id
+        where o.status in (20,30,90,21,91)
+        and o.goods_id = #{goodsId}
+        and gci.goods_id = #{goodsId}
+        and gci.delete_flag = 0
+        and gci.id = o.collect_info_id
+        order by o.create_time desc
+        limit 10
+    </select>
+
+    <select id="queryUserCollectOrder" resultMap="CollectOrderMap">
+        select o.id as order_id,
+        o.shoper_id,
+        o.shoper_name,
+        case when gci.last_valid_time > now() then 0
+        when collect_num > buy_num then 2
+        else 1
+        end as collect_status,
+        o.goods_num as num,
+        gci.collect_num,
+        gci.buy_num,
+        gci.collect_price as price,
+        g.first_show_img,
+        g.goods_name,
+        g.id as goodsId
+        from order_main o
+        inner join goods_collect_info gci on gci.id = o.collect_info_id
+        left join goods g on g.id = o.goods_id
+        where o.collect_flag = 1 and o.status in (20,30,21,91)
+        and o.user_id = #{userId}
+        <choose>
+            <when test="orderStatus == 0">
+                and gci.last_valid_time > now()
+            </when>
+            <when test="orderStatus == 1">
+                and gci.last_valid_time <![CDATA[ <= ]]> now()
+                and gci.collect_num <![CDATA[ <= ]]> gci.buy_num
+            </when>
+            <when test="orderStatus == 2">
+                and gci.last_valid_time <![CDATA[ <= ]]> now()
+                and gci.collect_num <![CDATA[ > ]]> gci.buy_num
+            </when>
+        </choose>
+        order by o.create_time desc
+    </select>
+
+    <select id="queryCollectOrderDetail" resultMap="CollectOrderDetailMap">
+      select
+        o.shoper_id,
+        o.shoper_name,
+        o.goods_name,
+        gci.collect_price as price,
+        gci.collect_num,
+        gci.buy_num,
+        o.goods_num as num,
+        g.first_show_img img,
+        g.goods_retail_price,
+        o.id as order_id,
+        o.create_time,
+        o.user_id,
+        o.phone as user_phone,
+        case when gci.last_valid_time > now() then 0
+        when gci.collect_num > gci.buy_num then 2
+        else 1
+        end as collect_status,
+        case when su.name = '' or su.name is null  then su.nickname
+        else su.name end as name ,
+        su.avatar as user_avatar,
+        gci.last_valid_time as collect_last_valid_time,
+        o.status as order_status,
+        o.goods_id,
+        o.has_refund as has_refund_flag
+      from order_main o
+      inner join goods_collect_info gci on gci.id = o.collect_info_id
+      left join goods g on g.id = o.goods_id
+      left join sys_user su on su.id = o.user_id
+      where o.id = #{orderId}
+      and o.collect_flag = 1
+    </select>
+
+    <select id="queryByCollectInfo" resultMap="BaseResultMap">
+        select *
+        from order_main
+        where collect_info_id = #{collectId}
+        and status in (21,91)
+    </select>
+
+    <update id="updateOrderToCollectSuccess">
+       update order_main
+       set status = 20
+       where status in (21,91)
+       and collect_info_id = #{id}
+   </update>
+
+    <select id="queryBeforeThisCollectOrderNum" resultType="java.lang.Integer">
+      select count(1)
+      from order_main o
+      INNER join order_main o1 on o.collect_info_id = o1.collect_info_id
+      and o1.status in (20,30,21,91) and o1.create_time <![CDATA[ < ]]> o.create_time
+      where  o.id = #{orderId}
+    </select>
+
+    <select id="getWriteOffList" resultMap="BaseResultMap">
+        select om.*
+        from order_main om
+        <if test="agentId != null and agentId != ''">
+            ,sys_user_merchant su
+        </if>
+        where om.delete_flag = 10
+        and om.status not in (40,60,70)
+        <if test="goodsName != null and goodsName != ''">
+            and om.goods_name like "%"#{goodsName}"%"
+        </if>
+        <if test="goodsId != null and goodsId != ''">
+            and om.goods_id like "%"#{goodsId}"%"
+        </if>
+        <if test="id != null and id != ''">
+            and om.id like "%"#{id}"%"
+        </if>
+        <if test="phone != null and phone != ''">
+            and om.phone like "%"#{phone}"%"
+        </if>
+        <if test="userId != null and userId != ''">
+            and om.user_id like "%"#{userId}"%"
+        </if>
+        <if test="shopId != null and shopId != ''">
+            and om.shoper_id like "%"#{shopId}"%"
+        </if>
+        <if test="writeOffStatus != null">
+            and om.write_off_status = #{writeOffStatus}
+        </if>
+        <if test="writeOffStartTime != null">
+            and om.write_off_time > #{writeOffStartTime}
+        </if>
+        <if test="writeOffEndTime != null">
+            and #{writeOffEndTime} > om.write_off_time
+        </if>
+        <if test="agentId != null and agentId != ''">
+            and su.id = om.shoper_id
+            and exists (
+            select 1
+            from agent_county_info aci
+            where aci.agent_id = #{agentId}
+            and aci.county_code = su.county_id
+            )
+        </if>
+        order by om.write_off_time desc
+    </select>
+
+    <select id="getShareOrder" resultMap="SysShareProfitVoMap">
+        SELECT o.id AS order_id,o.`shoper_id` AS merchant_id
+        ,o.`goods_name`,o.`goods_num` AS buy_num
+        ,CASE WHEN o.collect_flag = 1 THEN 1 when g.supply_chain = 1 then 2 WHEN g.hot = 1 THEN 3 ELSE 4 END AS
+        goods_type
+        ,o.actual_price AS order_price ,o.actual_price * o.share_rate AS profit_free
+        ,o.create_time , o.share_merchant_id,o.status
+        FROM order_main o
+        ,goods g
+        <if test="(countyId != null and countyId != '') or roleId == 4">
+            ,sys_user_merchant su
+        </if>
+        <where>
+            o.share_merchant_id != ''
+            <if test="goodsName != null and goodsName != ''">
+                AND o.`goods_name` LIKE "%"#{goodsName}"%"
+            </if>
+            <if test="merchantId != null and merchantId != ''">
+                AND o.`shoper_id` LIKE "%"#{merchantId}"%"
+            </if>
+            <if test="beginTime != null">
+                AND o.`create_time` > #{beginTime}
+            </if>
+            <if test="endTime != null">
+                AND #{endTime} > o.`create_time`
+            </if>
+            <if test="(countyId != null and countyId != '') or roleId == 4">
+                AND su.id = o.`shoper_id`
+            </if>
+            <if test="countyId != null and countyId != ''">
+                AND su.`county_id` = #{countyId}
+            </if>
+            AND g.id = o.`goods_id`
+            <if test="goodsTypeId != null and goodsTypeId != ''">
+                and g.goods_type_id = #{goodsTypeId}
+            </if>
+            <if test="goodsSubClassId != null and goodsSubClassId != ''">
+                and g.goods_subclass_id = #{goodsSubClassId}
+            </if>
+            <choose>
+                <when test="orderType != null and orderType == 1">
+                    and o.collect_flag = 1
+                </when>
+                <when test="orderType != null and orderType == 2">
+                    and g.supply_chain = 1
+                </when>
+                <when test="orderType != null and orderType == 3">
+                    and g.hot = 1
+                    and g.supply_chain = 0
+                </when>
+            </choose>
+            <choose>
+                <when test="roleId == 4">
+                    and su.id = o.shoper_id
+                    and exists (
+                    select 1
+                    from agent_county_info aci
+                    where aci.agent_id = #{userId}
+                    and aci.county_code = su.county_id
+                    )
+                </when>
+                <when test="roleId == 3 and shareFlag == 1">
+                    and o.share_merchant_id = #{userId}
+                </when>
+                <when test="roleId == 3 and shareFlag == 2">
+                    and o.shoper_id = #{userId}
+                </when>
+            </choose>
+            and o.delete_flag = 10
+        </where>
+    </select>
+</mapper>

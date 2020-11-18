@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.trade.ShoppingCartInfoMapper">
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.trade.ShoppingCartInfo">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="good_id" property="goodId"/>
+        <result column="num" property="num"/>
+        <result column="delete_flag" property="deleteFlag"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="last_valid_time" property="lastValidTime"/>
+    </resultMap>
+
+    <resultMap id="ShoppingCartInfoVoMap" type="com.edaochina.shopping.domain.vo.trade.ShoppingCartInfoVo"
+               extends="BaseResultMap">
+        <result column="shop_id" property="shopId"/>
+        <result column="goods_spec" property="goodsSpec"/>
+        <result column="img_url" property="imgUrl"/>
+        <result column="goods_num" property="goodsNum"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="shop_title" property="shopTitle"/>
+        <result column="limit_buy_num" property="limitBuyNum"/>
+        <result column="goods_price" property="goodsPrice"/>
+        <result column="limit_flag" property="limitFlag"/>
+        <result column="buy_num" property="buyNum"/>
+        <result column="shop_name" property="shopName"/>
+        <result column="shop_phone" property="shopPhone"/>
+        <result column="shop_address" property="shopAddress"/>
+        <result column="longitude" property="longitude"/>
+        <result column="latitude" property="latitude"/>
+        <result column="expired_flag" property="expiredFlag"/>
+    </resultMap>
+
+    <sql id="distance">
+		ROUND(6378.138*2*ASIN(SQRT(POW(SIN(
+		(#{latitude}*pi()/180-su.latitude*pi()/180)/2),2)+cos(#{latitude}*pi()/180)*cos(su.latitude*pi()/180)*
+		pow(sin(
+		(#{longitude}*pi()/180-su.longitude*pi()/180)/2),2)))*1000)
+	</sql>
+
+    <sql id="Base_Column_List">
+        id,user_id,good_id,num,delete_flag,create_time,update_time,last_valid_time
+    </sql>
+    <insert id="addShoppingCart">
+        insert into shopping_cart_info(user_id,good_id,num,last_valid_time)
+        values (#{userId},#{goodId},#{num},date_add(now(),interval 1 day))
+    </insert>
+    <update id="updateShoppingCart">
+        update shopping_cart_info
+        set num = #{num},last_valid_time = date_add(update_time,interval 1 day)
+        where id = #{id}
+    </update>
+
+    <delete id="delShoppingCart">
+        delete from shopping_cart_info
+        where id = #{id}
+    </delete>
+
+    <select id="queryByUserIdAndGoodId" resultMap="BaseResultMap">
+      select *
+      from shopping_cart_info
+      where user_id = #{userId}
+      and good_id = #{goodsId}
+      and last_valid_time > now()
+      and delete_flag = 10
+    </select>
+
+    <select id="queryUserShoppingCart" resultMap="ShoppingCartInfoVoMap">
+        SELECT
+        sci.*,
+        <include refid="distance"/>
+        as distance,
+        g.`shop_id`,
+        g.`goods_spec`,
+        g.first_show_img as img_url,
+        g.`goods_surplus_num` as goods_num,
+        g.`goods_name`,
+        su.title shop_title,
+        g.limit_buy_num,
+        g.`goods_price`,
+        CASE
+        WHEN g.`limit_buy_flag` = 10
+        THEN 0
+        ELSE 1
+        END limit_flag,
+        CASE WHEN g.`limit_buy_flag` = 10
+        THEN 0
+        WHEN g.`limit_buy_flag` = 20
+        THEN o.dayNum
+        ELSE o.allNum END buy_num,
+        su.title shop_name,
+        su.phone shop_phone,
+        su.address shop_address,
+        su.longitude,
+        su.latitude
+        FROM
+        shopping_cart_info sci
+        LEFT JOIN goods g
+        ON sci.`good_id` = g.`id`
+        LEFT JOIN sys_user_merchant su ON su.id = g.shop_id
+        left JOIN
+        (SELECT
+        SUM(
+        CASE
+        WHEN om.`create_time` > DATE_FORMAT(NOW(), '%Y%m%d')
+        THEN om.goods_num
+        ELSE 0
+        END
+        ) dayNum,
+        SUM(om.goods_num) allNum,om.goods_id
+        FROM
+        order_main om
+        WHERE om.`user_id` = #{userId}
+        AND om.`status` IN (10, 20, 30, 50, 70)
+        GROUP BY om.goods_id
+        ) o ON o.goods_id = sci.`good_id`
+        WHERE sci.`user_id` = #{userId}
+        and sci.last_valid_time > now()
+        and g.delete_flag = 10
+        and sci.delete_flag = 10
+    </select>
+
+    <select id="v2QueryUserShoppingCart" resultMap="ShoppingCartInfoVoMap">
+        SELECT
+        sci.*,
+        <include refid="distance"/>
+        as distance,
+        g.`shop_id`,
+        g.`goods_spec`,
+        g.first_show_img as img_url,
+        g.`goods_surplus_num` as goods_num,
+        g.`goods_name`,
+        su.title shop_title,
+        g.limit_buy_num,
+        g.`goods_price`,
+        CASE
+        WHEN g.`limit_buy_flag` = 10
+        THEN 0
+        ELSE 1
+        END limit_flag,
+        CASE WHEN g.`limit_buy_flag` = 10
+        THEN 0
+        WHEN g.`limit_buy_flag` = 20
+        THEN o.dayNum
+        ELSE o.allNum END buy_num,
+        CASE
+        WHEN g.last_valid_time > now() and approval_flag = 30
+        THEN 0
+        ELSE 1
+        END expired_flag,
+        su.title shop_name,
+        su.phone shop_phone,
+        su.address shop_address,
+        su.longitude,
+        su.latitude
+        FROM
+        shopping_cart_info sci
+        LEFT JOIN goods g
+        ON sci.`good_id` = g.`id`
+        LEFT JOIN sys_user_merchant su ON su.id = g.shop_id
+        left JOIN
+        (SELECT
+        SUM(
+        CASE
+        WHEN om.`create_time` > DATE_FORMAT(NOW(), '%Y%m%d')
+        THEN om.goods_num
+        ELSE 0
+        END
+        ) dayNum,
+        SUM(om.goods_num) allNum,om.goods_id
+        FROM
+        order_main om
+        WHERE om.`user_id` = #{userId}
+        AND om.`status` IN (10, 20, 30, 50, 70)
+        GROUP BY om.goods_id
+        ) o ON o.goods_id = sci.`good_id`
+        WHERE sci.`user_id` = #{userId}
+        and sci.delete_flag = 10
+    </select>
+
+    <select id="queryById" resultMap="BaseResultMap">
+        select *
+        from shopping_cart_info
+        where id = #{id}
+    </select>
+
+    <update id="updateShoppingCartList">
+        update shopping_cart_info
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="num = case" suffix="end,">
+                <foreach collection="shoppingCarts" item="scs" index="index">
+                    <if test="scs.num !=null and scs.num != ''">
+                        when id=#{scs.id} then #{scs.num}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="last_valid_time = case" suffix="else date_add(now(),interval 1 day) end">
+                <foreach collection="shoppingCarts" item="scs" index="index">
+                    when id = #{scs.id} and #{scs.num} = num then last_valid_time
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="shoppingCarts" separator="," item="scs" index="index" open="(" close=")">
+            #{scs.id}
+        </foreach>
+    </update>
+    <update id="updateCartDelStatus">
+        update shopping_cart_info
+        set delete_flag = #{deleteFlag}
+        where id = #{id}
+    </update>
+    <update id="restoreShoppingCart">
+        update shopping_cart_info shop
+        set shop.delete_flag = 10
+        where shop.user_id = #{userId}
+        and exists(
+        select 1
+        from order_main om
+        where om.order_no = #{orderId}
+        and shop.good_id = om.goods_id
+        )
+    </update>
+
+    <delete id="cleanOverTimeShoppingCart">
+        delete from shopping_cart_info
+        where last_valid_time <![CDATA[ < ]]> now()
+    </delete>
+
+    <delete id="removeAllShoppingCarts">
+        delete from shopping_cart_info
+        where user_id = #{userId}
+    </delete>
+    <delete id="deleteCartList">
+        delete from shopping_cart_info
+        where id in
+        <foreach collection="ids" separator="," item="id" index="index" open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteInvalidCart">
+        delete from shopping_cart_info
+        where user_id = #{userId}
+        and exists(
+          select 1
+          from goods g
+          where shopping_cart_info.good_id = g.id
+          and (g.approval_flag != 30 or g.last_valid_time <![CDATA[ < ]]> now())
+        )
+    </delete>
+
+    <select id="shoppingCartCount" resultType="java.lang.Integer">
+        select count(1)
+        from shopping_cart_info
+        where user_id = #{userId}
+    </select>
+    <select id="validCartCount" resultType="java.lang.Integer">
+        select sum(sci.num)
+        from shopping_cart_info sci
+        where sci.user_id = #{userId}
+        and sci.delete_flag = 10
+    </select>
+</mapper>

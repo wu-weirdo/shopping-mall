@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.user.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.user.SysUser">
+        <id column="id" property="id"/>
+        <result column="nickname" property="nickname"/>
+        <result column="avatar" property="avatar"/>
+        <result column="gender" property="gender"/>
+        <result column="bind_community" property="bindCommunity"/>
+        <result column="open_id" property="openId"/>
+        <result column="name" property="name"/>
+        <result column="phone" property="phone"/>
+        <result column="address" property="address"/>
+        <result column="origin" property="origin"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="province_code" property="provinceCode"/>
+        <result column="province_name" property="provinceName"/>
+        <result column="city_code" property="cityCode"/>
+        <result column="city_name" property="cityName"/>
+        <result column="county_code" property="countyCode"/>
+        <result column="county_name" property="countyName"/>
+        <result column="user_city_address" property="userCityAddress"/>
+        <result column="del_flg" property="delFlg"/>
+        <result column="session_key" property="sessionKey"/>
+        <result column="phone_update_flag" property="phoneUpdateFlag"/>
+        <result column="law_consumer_id" property="lawConsumerId"/>
+        <result column="discount_money" property="discountMoney"/>
+    </resultMap>
+
+    <resultMap id="MerchantCustomerVoMap" type="com.edaochina.shopping.domain.vo.user.MerchantCustomerVo">
+        <id column="id" property="id"/>
+        <result column="nickname" property="nickname"/>
+        <result column="avatar" property="avatar"/>
+        <result column="gender" property="gender"/>
+        <result column="name" property="name"/>
+        <result column="phone" property="phone"/>
+        <result column="order_num" property="orderNum"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, nickname, avatar, gender, bind_community, open_id, name, phone, address, origin, status, create_time, update_time,
+        province_code,province_name,city_code,city_name,county_code,county_name,user_city_address,del_flg,law_consumer_id
+    </sql>
+
+    <select id="userList" parameterType="com.edaochina.shopping.domain.dto.user.UserDTO"
+            resultType="com.edaochina.shopping.domain.vo.user.UserVO">
+        SELECT u.id, u.name, u.nickname, u.avatar, u.gender , c.name communityName, u.phone, u.address,
+        m.title origin, u.status, u.create_time createTime,
+        case when u.member_type = 1 and u.status = 1 then u.member_time else null end as memberTime,
+        u.member_type AS memberType,
+        user_city_address as userCityAddress
+        FROM (select * from sys_user u
+        WHERE u.del_flg = 1
+        <if test="community != null and community != '' ">
+            AND u.bind_community = #{community}
+        </if>
+        <if test="id != null and id != '' ">
+            AND u.id LIKE "%"#{id}"%"
+        </if>
+        <if test="nickName != null and nickName != '' ">
+            AND u.nickname LIKE "%"#{nickName}"%"
+        </if>
+        <if test="phone != null and phone != '' ">
+            AND u.phone LIKE "%"#{phone}"%"
+        </if>
+        <if test="beginTime != null">
+            AND u.create_time <![CDATA[ >= ]]> #{beginTime}
+        </if>
+        <if test="endTime != null">
+            AND u.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="beginMemberTime != null">
+            AND u.member_time <![CDATA[ >= ]]> #{beginMemberTime}
+            and u.member_type = 1
+        </if>
+        <if test="endMemberTime != null">
+            AND u.member_time <![CDATA[ <= ]]> #{endMemberTime}
+            and u.member_type = 1
+        </if>
+        <if test="userCityAddress != null and userCityAddress != ''">
+            and u.county_code = #{userCityAddress}
+        </if>
+        <if test="isMember == 'true'.toString()">
+            and u.member_type = 1
+        </if>
+        <if test="isMember == 'false'.toString()">
+            and u.member_type = 0
+        </if>
+        <if test="roleId == '6'.toString()">
+            and u.partener_id = #{userId}
+        </if>
+        order by u.create_time desc
+        limit ${pages.begIndex},${pages.pageSize}
+        ) u LEFT JOIN community c ON u.bind_community = c.id
+        LEFT JOIN sys_user_merchant m ON u.origin = m.id
+    </select>
+
+    <select id="userListCount" parameterType="com.edaochina.shopping.domain.dto.user.UserDTO"
+            resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM sys_user u
+        WHERE u.del_flg = 1
+        <if test="community != null and community != '' ">
+            AND u.bind_community = #{community}
+        </if>
+        <if test="id != null and id != '' ">
+            AND u.id LIKE "%"#{id}"%"
+        </if>
+        <if test="nickName != null and nickName != '' ">
+            AND u.nickname LIKE "%"#{nickName}"%"
+        </if>
+        <if test="phone != null and phone != '' ">
+            AND u.phone LIKE "%"#{phone}"%"
+        </if>
+        <if test="beginTime != null">
+            AND u.create_time <![CDATA[ >= ]]> #{beginTime}
+        </if>
+        <if test="endTime != null">
+            AND u.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="beginMemberTime != null">
+            AND u.member_time <![CDATA[ >= ]]> #{beginMemberTime}
+            and u.member_type = 1
+        </if>
+        <if test="endMemberTime != null">
+            AND u.member_time <![CDATA[ <= ]]> #{endMemberTime}
+            and u.member_type = 1
+        </if>
+        <if test="userCityAddress != null and userCityAddress != ''">
+            and u.county_code = #{userCityAddress}
+        </if>
+        <if test="isMember == 'true'.toString()">
+            and u.member_type = 1
+        </if>
+        <if test="isMember == 'false'.toString()">
+            and u.member_type = 0
+        </if>
+        <if test="roleId == '6'.toString()">
+            and u.partener_id = #{userId}
+        </if>
+    </select>
+
+    <update id="updateUserMemberType">
+        update sys_user set member_type = #{s},origin = #{shopName},partener_id= #{partenerId} where id = #{id}
+    </update>
+    <update id="deleteAccount">
+      update sys_user set del_flg = 2 where id = #{id}
+    </update>
+    <update id="updateAccount">
+      update sys_user set
+       phone = #{phone},address = #{address},gender = #{gender},name = #{name}
+       where id = #{id}
+    </update>
+    <select id="getUserById" resultMap="BaseResultMap">
+        select *
+        from sys_user
+        where id = #{id}
+    </select>
+    <select id="userListByRole" resultType="com.edaochina.shopping.domain.vo.user.UserVO">
+        SELECT u.id, u.name, u.nickname, u.avatar, u.gender , c.name communityName, u.phone, u.address,
+        m.title origin, u.status, u.create_time createTime,
+        case when u.member_type = 1 and u.status = 1 then u.member_time else null end as memberTime,
+        u.member_type AS memberType,
+        user_city_address as userCityAddress
+        from (
+        select u.*
+        FROM agent_county_info aci
+        LEFT JOIN sys_user u ON aci.county_code = u.county_code
+        WHERE u.del_flg = 1
+        and aci.agent_id = #{userId}
+        and u.county_code != ''
+        <if test="community != null and community != '' ">
+            AND u.bind_community = #{community}
+        </if>
+        <if test="id != null and id != '' ">
+            AND u.id LIKE "%"#{id}"%"
+        </if>
+        <if test="nickName != null and nickName != '' ">
+            AND u.nickname LIKE "%"#{nickName}"%"
+        </if>
+        <if test="phone != null and phone != '' ">
+            AND u.phone LIKE "%"#{phone}"%"
+        </if>
+        <if test="beginTime != null">
+            AND u.create_time <![CDATA[ >= ]]> #{beginTime}
+        </if>
+        <if test="endTime != null">
+            AND u.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="userCityAddress != null and userCityAddress != ''">
+            and u.county_code = #{userCityAddress}
+        </if>
+        <if test="isMember == 'true'.toString()">
+            and u.member_type = 1
+        </if>
+        <if test="isMember == 'false'.toString()">
+            and u.member_type = 0
+        </if>
+        order by u.create_time desc
+        limit ${pages.begIndex},${pages.pageSize}
+        ) u
+        LEFT JOIN community c ON u.bind_community = c.id
+        LEFT JOIN sys_user_merchant m ON u.origin = m.id
+    </select>
+
+
+    <select id="userListByRoleCount" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM agent_county_info aci
+        LEFT JOIN sys_user u ON aci.county_code = u.county_code
+        WHERE 1=1
+        and u.del_flg = 1
+        and aci.agent_id = #{userId}
+        and u.county_code != ''
+        <if test="community != null and community != '' ">
+            AND u.bind_community = #{community}
+        </if>
+        <if test="id != null and id != '' ">
+            AND u.id LIKE "%"#{id}"%"
+        </if>
+        <if test="nickName != null and nickName != '' ">
+            AND u.nickname LIKE "%"#{nickName}"%"
+        </if>
+        <if test="phone != null and phone != '' ">
+            AND u.phone LIKE "%"#{phone}"%"
+        </if>
+        <if test="beginTime != null">
+            AND u.create_time <![CDATA[ >= ]]> #{beginTime}
+        </if>
+        <if test="endTime != null">
+            AND u.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="userCityAddress != null and userCityAddress != ''">
+            and u.county_code = #{userCityAddress}
+        </if>
+        <if test="isMember == 'true'.toString()">
+            and u.member_type = 1
+        </if>
+        <if test="isMember == 'false'.toString()">
+            and u.member_type = 0
+        </if>
+    </select>
+
+
+    <update id="updateUserInfo">
+        update sys_user set
+        <trim prefixOverrides=",">
+            <if test="nickname != null and nickname != ''">
+                ,nickname = #{nickname}
+            </if>
+            <if test="bindCommunity != null and bindCommunity != ''">
+                ,bind_community = #{bindCommunity}
+            </if>
+            <if test="gender != null and gender != ''">
+                ,gender = #{gender}
+            </if>
+            <if test="avatar != null and avatar != ''">
+                ,avatar = #{avatar}
+            </if>
+            <if test="openId != null and openId != ''">
+                ,open_id = #{openId}
+            </if>
+            <if test="sessionKey != null and sessionKey != ''">
+                ,session_key = #{sessionKey}
+            </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="updateUserLawId">
+      update sys_user set law_consumer_id = #{lawId}
+      where id = #{userId}
+    </update>
+    <update id="updateUserPhone">
+        update sys_user
+        set phone = #{phone}, phone_update_flag = 1
+        where id = #{userId}
+    </update>
+
+    <update id="updateUserSessionKey">
+        update sys_user
+        set session_key = #{sessionKey}
+        where open_id = #{openId}
+    </update>
+
+    <update id="updateUserTencetOpenIdByUid">
+        update sys_user
+        set tencent_open_id = #{tencentOpenId}
+        where wx_uid = #{uid}
+    </update>
+
+    <update id="updateUserUid">
+        update sys_user
+        set wx_uid = #{uid}
+        where open_id = #{openId}
+    </update>
+
+    <select id="selectUsers" resultMap="BaseResultMap">
+        select *
+        from sys_user
+        limit #{startIndex},#{num}
+    </select>
+
+    <select id="queryByPhone" resultMap="BaseResultMap">
+        select * from sys_user
+        where status = 1
+        and phone = #{phone}
+    </select>
+
+    <select id="queryHasPhone" resultMap="BaseResultMap">
+        select *
+        from sys_user
+        where member_type = 1
+        and phone_update_flag = 1
+        limit #{startNum},#{num}
+    </select>
+
+    <select id="queryHasByGoodsInShop" resultType="com.edaochina.shopping.domain.vo.user.UserVO">
+        SELECT u.id, u.name, u.nickname, u.avatar, u.gender , c.name communityName, u.phone, u.address,
+        m.title origin, u.status, u.create_time createTime,
+        CASE WHEN u.member_type = 1 AND u.status = 1 THEN u.member_time ELSE NULL END AS memberTime,
+        u.member_type AS memberType,
+        user_city_address AS userCityAddress
+        from (
+        select u.*
+        FROM sys_user u
+        left join order_main o ON o.user_id = u.id
+        WHERE u.del_flg = 1
+        AND o.shoper_id = #{userId}
+        AND o.delete_flag = 10
+        <if test="community != null and community != '' ">
+            AND u.bind_community = #{community}
+        </if>
+        <if test="id != null and id != '' ">
+            AND u.id LIKE "%"#{id}"%"
+        </if>
+        <if test="nickName != null and nickName != '' ">
+            AND u.nickname LIKE "%"#{nickName}"%"
+        </if>
+        <if test="phone != null and phone != '' ">
+            AND u.phone LIKE "%"#{phone}"%"
+        </if>
+        <if test="beginTime != null">
+            AND u.create_time <![CDATA[ >= ]]> #{beginTime}
+        </if>
+        <if test="endTime != null">
+            AND u.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="userCityAddress != null and userCityAddress != ''">
+            AND u.county_code = #{userCityAddress}
+        </if>
+        <if test="isMember == 'true'.toString()">
+            AND u.member_type = 1
+        </if>
+        <if test="isMember == 'false'.toString()">
+            AND u.member_type = 0
+        </if>
+        order by u.create_time desc
+        limit ${pages.begIndex},${pages.pageSize}
+        ) u
+        LEFT JOIN community c ON u.bind_community = c.id
+        LEFT JOIN sys_user_merchant m ON u.origin = m.id
+    </select>
+
+
+    <select id="queryHasByGoodsInShopCount" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM sys_user u
+        left join order_main o ON o.user_id = u.id
+        WHERE u.del_flg = 1
+        AND o.shoper_id = #{userId}
+        AND o.delete_flag = 10
+        <if test="community != null and community != '' ">
+            AND u.bind_community = #{community}
+        </if>
+        <if test="id != null and id != '' ">
+            AND u.id LIKE "%"#{id}"%"
+        </if>
+        <if test="nickName != null and nickName != '' ">
+            AND u.nickname LIKE "%"#{nickName}"%"
+        </if>
+        <if test="phone != null and phone != '' ">
+            AND u.phone LIKE "%"#{phone}"%"
+        </if>
+        <if test="beginTime != null">
+            AND u.create_time <![CDATA[ >= ]]> #{beginTime}
+        </if>
+        <if test="endTime != null">
+            AND u.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="userCityAddress != null and userCityAddress != ''">
+            AND u.county_code = #{userCityAddress}
+        </if>
+        <if test="isMember == 'true'.toString()">
+            AND u.member_type = 1
+        </if>
+        <if test="isMember == 'false'.toString()">
+            AND u.member_type = 0
+        </if>
+    </select>
+
+    <select id="getMemberNumByAgentId" resultType="java.lang.Integer">
+      select count(1)
+      from sys_user su,agent_county_info aci
+      where su.county_code = aci.county_code
+      and aci.agent_id = #{id}
+    </select>
+
+    <select id="merchantCustomer" resultMap="MerchantCustomerVoMap">
+        select su.*,sm.order_num
+        from sys_user su,(
+        select count(1) order_num,user_id
+        from order_main o
+        where o.shoper_id = #{merchantId}
+        and o.status != 80
+        <if test="beginTime">
+            and o.create_time > #{beginTime}
+        </if>
+        <if test="endTime">
+            and #{endTime} > o.create_time
+        </if>
+        group by o.user_id
+        ) sm
+        where su.id = sm.user_id
+        order by su.create_time desc
+    </select>
+</mapper>

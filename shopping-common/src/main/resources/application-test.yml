@@ -1,0 +1,88 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
+  # Jackson
+  jackson:
+    time-zone: GMT+8
+  # 驱动配置信息
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      # 体验版
+      url: jdbc:mysql://47.96.139.110:3306/cdshopping?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8&useSSL=true
+      username: root
+      password: Hzcd@75342
+      # 初始化大小
+      initial-size: 5
+      # 最小
+      min-idle: 5
+      # 最大
+      max-active: 20
+      # 等待超时时间，单位是毫秒
+      max-wait: 60000
+      # 最小生存时间，单位是毫秒
+      min-evictable-idle-time-millis: 300000
+      validation-query: select 1 from dual
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      # filters: stat,wall
+      # connect-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+      # use-global-data-source-stat: true
+    #redis
+  redis:
+    database: 4
+    host: 47.96.224.103
+    port: 7000
+    password: Hzydkj@75342
+  mail:
+    host: smtp.exmail.qq.com
+    username: wangpenglei@tan66.com
+    port: 465
+    password: jndnPFM8vakb9Q3c
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true
+
+# mybatis-plus
+mybatis-plus:
+  mapperLocations: classpath*:mapper/*/*.xml
+  type-aliases-package: com.edaochina.shopping.domain.entity
+  type-handlers-package: com.edaochina.shopping.common.handler
+# 微信回调地址
+wx:
+  pay-callBack-url: https://app.chengd24h.com/test/app/wxpay/notifyWxPay
+  pay-seckill-callBack-url: https://app.chengd24h.com/test/app/wxpay/notifySeckillWxPay
+  pay-shopping-callBack-url: https://app.chengd24h.com/test/app/wxpay/notifyShoppingWxPay
+  pay-user-member-callBack-url: https://app.chengd24h.com/test/app/wxpay/notifyUserMemberPay
+  refund-call-callBack-url: https://app.chengd24h.com/test/app/wxpay/refundCallBack
+  pay:
+    appId: wx032c7b34325225ae #微信公众号或者小程序等的appid
+    mchId: 1524504971 #微信支付商户号
+    mchKey: 12345678123456781234567812cdwljs #微信支付商户密钥
+    #    subAppId: #服务商模式下的子商户公众账号ID
+    #    subMchId: #服务商模式下的子商户号
+    keyPath: classpath:apiclient_cert.p12 # p12证书的位置，可以指定绝对路径，也可以指定类路径（以classpath:开头）
+
+developer:
+  mail:  wangpenglei@tan66.com,jintian@tan66.com
+# 法大大相关配置
+fadada:
+  app_id: 500008
+  app_secret: 1oBkoUFo2BaGPBuXze8ZYZBI
+  app_company_name: 杭州成典网络技术有限公司
+  app_company_code: 10ECB90FFABBAA2A8B0E5885C1530A2C
+  version: 2.0
+  host: https://textapi.fadada.com/api2/
+  return_url: 1
+  notify_url: https://app.chengd24h.com/test/app/law/acceptReturn
+
+amap:
+  key: 0f4a8c29fa41877717f64c9d8948ba51
+
+server:
+  ip: 47.96.139.110

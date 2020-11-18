@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.goods.GoodsSubclassMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.goods.GoodsSubclass">
+        <id column="id" property="id"/>
+        <result column="type_id" property="typeId"/>
+        <result column="subclass_name" property="subclassName"/>
+        <result column="sort" property="sort"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, type_id, subclass_name, sort
+    </sql>
+
+
+    <select id="getAllGoodsClassList" resultMap="BaseResultMap">
+        select *
+        from goods_subclass gt
+        where exists (
+          select 1
+          from goods g
+          inner join sys_merchant_community smc on smc.merchant_id = g.shop_id
+          where smc.community = #{communityId}
+          and g.goods_subclass_id = gt.id
+          and g.approval_flag = 30
+          and g.`delete_flag` = 10
+          and g.last_valid_time > now()
+          and now() > g.putaway_time
+        )
+    </select>
+
+</mapper>

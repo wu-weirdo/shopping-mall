@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.trade.TradeDetailMerchantMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.trade.TradeDetailMerchant">
+        <id column="id" property="id"/>
+        <result column="out_trade_no" property="outTradeNo"/>
+        <result column="transaction_id" property="transactionId"/>
+        <result column="pay_object" property="payObject"/>
+        <result column="cost_price" property="costPrice"/>
+        <result column="profit_money" property="profitMoney"/>
+        <result column="total_income" property="totalIncome"/>
+        <result column="merchant_id" property="merchantId"/>
+        <result column="merchant_name" property="merchantName"/>
+        <result column="pay_user_id" property="payUserId"/>
+        <result column="pay_user_name" property="payUserName"/>
+        <result column="pay_time" property="payTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="write_off_time" property="writeOffTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, out_trade_no, transaction_id, pay_object, cost_price, profit_money, total_income, merchant_id, merchant_name, pay_user_id, pay_user_name, pay_time, create_time, remark
+    </sql>
+
+    <!--查询本月盈利-->
+    <select id="getCurrMonthProfit" parameterType="com.edaochina.shopping.domain.dto.trade.TradeDetailMerchantDTO"
+            resultType="java.math.BigDecimal">
+        select ifnull(sum(profit_money),0) from trade_detail_merchant where 1=1
+        <if test="merchantId != null and merchantId != '' ">
+            AND merchant_id = #{merchantId}
+        </if>
+        <if test="startTime != null ">
+            AND write_off_time <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="endTime != null ">
+            AND write_off_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+    </select>
+
+    <!-- 获取当天收入 -->
+    <select id="getTodayInCome" parameterType="com.edaochina.shopping.domain.dto.trade.TradeDetailMerchantDTO"
+            resultType="java.math.BigDecimal">
+        select ifnull(sum(total_income),0) from trade_detail_merchant where 1=1
+        <if test="merchantId != null and merchantId != '' ">
+            AND merchant_id = #{merchantId}
+        </if>
+        <if test="startTime != null ">
+            AND write_off_time <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="endTime != null ">
+            AND write_off_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+    </select>
+
+    <!-- 获取本周收入 -->
+    <select id="getCurrWeekInCome" parameterType="com.edaochina.shopping.domain.dto.trade.TradeDetailMerchantDTO"
+            resultType="java.math.BigDecimal">
+        select ifnull(sum(total_income),0) from trade_detail_merchant where 1=1
+        <if test="merchantId != null and merchantId != '' ">
+            AND merchant_id = #{merchantId}
+        </if>
+        <if test="startTime != null ">
+            AND write_off_time <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="endTime != null ">
+            AND write_off_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+    </select>
+
+    <!-- 获取本月收入 -->
+    <select id="getCurrMonthInCome" parameterType="com.edaochina.shopping.domain.dto.trade.TradeDetailMerchantDTO"
+            resultType="java.math.BigDecimal">
+        select ifnull(sum(total_income),0) from trade_detail_merchant where 1=1
+        <if test="merchantId != null and merchantId != '' ">
+            AND merchant_id = #{merchantId}
+        </if>
+        <if test="startTime != null ">
+            AND write_off_time <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="endTime != null ">
+            AND write_off_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+    </select>
+
+    <!-- 获取本年收入 -->
+    <select id="getCurrYearInCome" parameterType="com.edaochina.shopping.domain.dto.trade.TradeDetailMerchantDTO"
+            resultType="java.math.BigDecimal">
+        select ifnull(sum(total_income),0) from trade_detail_merchant where 1=1
+        <if test="merchantId != null and merchantId != '' ">
+            AND merchant_id = #{merchantId}
+        </if>
+        <if test="startTime != null ">
+            AND write_off_time <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="endTime != null ">
+            AND write_off_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+    </select>
+</mapper>

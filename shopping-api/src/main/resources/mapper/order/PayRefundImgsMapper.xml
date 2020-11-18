@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.trade.PayRefundImgsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.trade.PayRefundImgs">
+        <id column="id" property="id"/>
+        <result column="refund_apply_id" property="refundApplyId"/>
+        <result column="img_url" property="imgUrl"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, refund_apply_id, img_url, create_time, update_time
+    </sql>
+
+    <insert id="insertImg">
+        insert into pay_refund_imgs(refund_apply_id, img_url)
+        values(#{refundApplyId},#{imgUrl})
+    </insert>
+    <select id="selectByRefundApplyId" resultType="java.lang.String">
+        select img_url
+        from pay_refund_imgs
+        where refund_apply_id = #{refundApplyId}
+    </select>
+</mapper>

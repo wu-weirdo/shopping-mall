@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.goods.GoodsCollectInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.goods.GoodsCollectInfo">
+        <id column="id" property="id"/>
+        <result column="goods_id" property="goodsId"/>
+        <result column="last_valid_time" property="lastValidTime"/>
+        <result column="collect_num" property="collectNum"/>
+        <result column="buy_num" property="buyNum"/>
+        <result column="collect_info" property="collectInfo"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="remark" property="remark"/>
+        <result column="collect_price" property="collectPrice"/>
+        <result column="collect_status" property="collectStatus"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+    </sql>
+
+    <select id="getCollectInfoByGoodsId" resultMap="BaseResultMap">
+        select *
+        from cdshopping.goods_collect_info
+        where goods_id = #{goodsId}
+          and delete_flag = 0
+    </select>
+
+    <delete id="removeCollectByGoodsId">
+        delete
+        from cdshopping.goods_collect_info
+        where goods_id = #{goodsId}
+        and delete_flag = 0
+    </delete>
+
+    <insert id="addCollect">
+        insert into cdshopping.goods_collect_info
+        (
+          goods_id,
+          last_valid_time,
+          collect_num,
+          collect_info,
+          create_user_id,
+          buy_num,
+          collect_price
+        )
+        value
+        (
+          #{goodsId},
+          #{lastValidTime},
+          #{collectNum},
+          #{collectInfo},
+          #{createUserId},
+          #{buyNum},
+          #{collectPrice}
+        )
+    </insert>
+
+    <update id="addBuyNum">
+        update cdshopping.goods_collect_info
+        set buy_num = buy_num + #{goodsNum}
+        where goods_id = #{goodsId}
+          and delete_flag = 0
+    </update>
+
+    <update id="ripening">
+        update cdshopping.goods_collect_info
+        set collect_num     = #{collectNum},
+            last_valid_time = #{lastValidTime}
+        where goods_id = #{goodsId}
+          and delete_flag = 0
+          and buy_num = #{buyNum}
+    </update>
+
+    <update id="updateTodel">
+        update cdshopping.goods_collect_info
+        set delete_flag = 1
+        where id = #{id}
+    </update>
+
+    <select id="getOverTimeCollects" resultMap="BaseResultMap">
+        select *
+        from cdshopping.goods_collect_info
+      where delete_flag = 0
+        and last_valid_time <![CDATA[ < ]]> now()
+        and collect_status = 0
+        limit 100
+    </select>
+
+    <update id="updateToEnd">
+        update goods_collect_info
+        set collect_status = 1
+        where id = #{id}
+    </update>
+</mapper>

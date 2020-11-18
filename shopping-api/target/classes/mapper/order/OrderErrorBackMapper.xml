@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.order.OrderErrorBackMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.order.OrderErrorBack">
+        <id column="id" property="id"/>
+        <result column="order_id" property="orderId"/>
+        <result column="order_status" property="orderStatus"/>
+        <result column="order_time" property="orderTime"/>
+        <result column="write_off_time" property="writeOffTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="handle_time" property="handleTime"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="goods_num" property="goodsNum"/>
+        <result column="goods_price" property="goodsPrice"/>
+        <result column="merchant_id" property="merchantId"/>
+        <result column="merchant_title" property="merchantTitle"/>
+        <result column="merchant_phone" property="merchantPhone"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_phone" property="userPhone"/>
+        <result column="exception_reason" property="exceptionReason"/>
+        <result column="origin" property="origin"/>
+        <result column="write_off_status" property="writeOffStatus"/>
+        <result column="handle_result" property="handleResult"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <resultMap id="VoMap" type="com.edaochina.shopping.domain.vo.order.OrderErrorBackVO" extends="BaseResultMap">
+        <result column="address" property="address"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, order_id, handle_time, order_status, order_time, write_off_time, create_time, goods_name, goods_num, goods_price, merchant_id, merchant_title, merchant_phone, user_id, user_phone, exception_reason, orgin, write_off_status, handle_result, remark
+    </sql>
+
+    <select id="orderErrorList" resultMap="VoMap">
+        select o.*,t.address as address
+        from order_error_back o
+        left join sys_user_merchant su on su.id = o.merchant_id
+        left join (
+        SELECT CONCAT(sa.`name`,sa1.`name`,sa2.`name`) address,sa2.`code` county_id
+        FROM sys_address sa
+        INNER JOIN sys_address sa1 ON sa.`code` = sa1.`parent_code`
+        INNER JOIN sys_address sa2 ON sa1.`code` = sa2.`parent_code`
+        WHERE sa2.`level` = 3
+        ) t on t.county_id = su.county_id
+        where o.handle_result = #{handleResult}
+        <if test="countyId != null and countyId != '' ">
+            and su.county_id = #{countyId}
+        </if>
+        <if test="orderId != null and orderId != '' ">
+            and o.order_id like "%"#{orderId}"%"
+        </if>
+        <if test="merchantTitle != null and merchantTitle != '' ">
+            and o.merchant_title like "%"#{merchantTitle}"%"
+        </if>
+        <if test="merchantId != null and merchantId != '' ">
+            and o.merchant_id like "%"#{merchantId}"%"
+        </if>
+        <if test="merchantPhone != null and merchantPhone != '' ">
+            and o.merchant_phone like "%"#{merchantPhone}"%"
+        </if>
+        <if test="userId != null and userId != '' ">
+            and o.user_id like "%"#{userId}"%"
+        </if>
+        <if test="userPhone != null and userPhone != '' ">
+            and o.user_phone like "%"#{userPhone}"%"
+        </if>
+        <if test="beginTime != null ">
+            and o.create_time <![CDATA[ >= ]]> #{beginTime}
+        </if>
+        <if test="endTime != null ">
+            and o.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="origin != null ">
+            and o.origin = #{origin}
+        </if>
+        order by o.create_time desc
+        limit ${pages.begIndex},${pages.pageSize}
+    </select>
+    <select id="selectByOrderId" resultType="com.edaochina.shopping.domain.entity.order.OrderErrorBack">
+        select *
+        from order_error_back
+        where order_id = #{orderId}
+    </select>
+    <select id="orderErrorCount" resultType="java.lang.Integer">
+        select COUNT(1)
+        from order_error_back
+        where handle_result = #{handleResult}
+        <if test="orderId != null and orderId != '' ">
+            and order_id like "%"#{orderId}"%"
+        </if>
+        <if test="merchantTitle != null and merchantTitle != '' ">
+            and merchant_title like "%"#{merchantTitle}"%"
+        </if>
+        <if test="merchantId != null and merchantId != '' ">
+            and merchant_id like "%"#{merchantId}"%"
+        </if>
+        <if test="merchantPhone != null and merchantPhone != '' ">
+            and merchant_phone like "%"#{merchantPhone}"%"
+        </if>
+        <if test="userId != null and userId != '' ">
+            and user_id like "%"#{userId}"%"
+        </if>
+        <if test="userPhone != null and userPhone != '' ">
+            and user_phone like "%"#{userPhone}"%"
+        </if>
+        <if test="beginTime != null ">
+            AND create_time <![CDATA[ >= ]]> #{beginTime}
+        </if>
+        <if test="endTime != null ">
+            AND create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="origin != null ">
+            and o.origin = #{origin}
+        </if>
+    </select>
+
+    <update id="updateOrderError">
+        update order_error_back
+        set write_off_status = #{writeOffStatus},
+            handle_result    = #{handleResult},
+            handle_time      = #{handleTime},
+            remark           = #{remark}
+        where id = #{id}
+    </update>
+
+    <insert id="saveToDb">
+        insert into order_error_back(
+        order_id,
+        order_status,
+        order_time,
+        write_off_time,
+        create_time,
+        goods_name,
+        goods_num,
+        goods_price,
+        merchant_id,
+        merchant_title,
+        merchant_phone,
+        user_id,
+        user_phone,
+        exception_reason,
+        origin,
+        write_off_status
+        )value(
+        #{orderId},
+        #{orderStatus},
+        #{orderTime},
+        #{writeOffTime},
+        #{createTime},
+        #{goodsName},
+        #{goodsNum},
+        #{goodsPrice},
+        #{merchantId},
+        #{merchantTitle},
+        #{merchantPhone},
+        #{userId},
+        #{userPhone},
+        #{exceptionReason},
+        #{origin},
+        #{writeOffStatus}
+        )
+        <selectKey keyProperty="id" order="AFTER" resultType="int">
+            select last_insert_id()
+        </selectKey>
+    </insert>
+
+    <select id="selectById" resultMap="VoMap">
+        select o.*, t.address
+        from order_error_back o
+                 left join sys_user_merchant su on su.id = o.merchant_id
+                 left join (
+            SELECT CONCAT(sa.`name`, sa1.`name`, sa2.`name`) address, sa2.`code` county_id
+            FROM sys_address sa
+                     INNER JOIN sys_address sa1 ON sa.`code` = sa1.`parent_code`
+                     INNER JOIN sys_address sa2 ON sa1.`code` = sa2.`parent_code`
+            WHERE sa2.`level` = 3
+        ) t on t.county_id = su.county_id
+        where o.id = #{id}
+    </select>
+
+    <select id="queryByOrderIdAndOrigin" resultMap="BaseResultMap">
+        select *
+        from order_error_back
+        where order_id = #{orderId}
+          and origin = #{origin}
+        limit 1
+    </select>
+</mapper>

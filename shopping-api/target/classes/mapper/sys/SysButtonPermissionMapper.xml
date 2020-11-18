@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edaochina.shopping.api.dao.sys.SysButtonPermissionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.edaochina.shopping.domain.entity.sys.SysButtonPermission">
+        <id column="id" property="id"/>
+        <result column="role_id" property="roleId"/>
+        <result column="button_id" property="buttonId"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, role_id, button_id
+    </sql>
+    <insert id="insertButtonPermission">
+        insert into sys_button_permission(role_id, button_id)
+        values (#{roleId}, #{buttonId})
+    </insert>
+    <delete id="deleteButtonPermission">
+        delete from sys_button_permission
+        where role_id = #{roleId}
+    </delete>
+    <select id="buttonPermissionList" resultType="java.lang.Integer">
+        select button_id
+        from sys_button_permission
+        where role_id = #{roleId}
+    </select>
+
+</mapper>
